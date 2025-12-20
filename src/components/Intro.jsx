@@ -36,8 +36,8 @@ const NoirIntro = ({ onFinish }) => {
     <div className="fixed inset-0 bg-black flex items-center justify-center z-[9999]">
       <h1
         ref={textRef}
-        className="text-white text-7xl md:text-9xl font-extrabold tracking-widest"
-        style={{ fontFamily: "Georgia, serif" }}
+        className="text-white h1 text-7xl md:text-9xl font-extrabold tracking-widest"
+        
       >
         NOIR
       </h1>

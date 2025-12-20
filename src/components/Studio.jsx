@@ -1,8 +1,8 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import p1 from '/src/assets/p1.png';
-import p2 from '/src/assets/p2.png'; // Add more imports
+import p2 from '/src/assets/p2.png';
 import p3 from '/src/assets/p3.png';
 import p4 from '/src/assets/p4.png';
 import p5 from '/src/assets/p5.png';
@@ -14,11 +14,146 @@ const Studio = () => {
   const slideContainerRef = useRef(null);
   const slidesRef = useRef([]);
   const progressBarRef = useRef(null);
+  const titleContainerRef = useRef(null);
+  const lettersRef = useRef([]);
   const currentSlideRef = useRef(0);
+  const [activeSlide, setActiveSlide] = useState(0);
   const totalSlides = 5;
 
-  // Import all your images
   const images = [p1, p2, p3, p4, p5];
+
+  // Split the title into words
+  const titleWords = ["NIGHT", "PERFORMANCE"];
+  const firstWordLetters = titleWords[0].split('');
+  const secondWordLetters = titleWords[1].split('');
+
+  useEffect(() => {
+    // Animate the title letters
+    const animateTitle = () => {
+      const allLetters = lettersRef.current.filter(Boolean);
+      
+      if (allLetters.length > 0) {
+        // Reset letters to initial state
+        gsap.set(allLetters, {
+          opacity: 0,
+          y: 40,
+          rotationX: -30,
+          scale: 0.8,
+          transformOrigin: 'center center'
+        });
+
+        // Create a timeline for the title animation
+        const titleTl = gsap.timeline({
+          delay: 0.5,
+          onComplete: () => {
+            // Add subtle floating animation after letters appear
+            gsap.to(allLetters, {
+              y: -3,
+              duration: 2,
+              repeat: -1,
+              yoyo: true,
+              ease: "sine.inOut",
+              stagger: {
+                amount: 0.8,
+                from: "random"
+              }
+            });
+          }
+        });
+
+        // Animate first word
+        titleTl.to(allLetters.slice(0, firstWordLetters.length), {
+          opacity: 1,
+          y: 0,
+          rotationX: 0,
+          scale: 1,
+          duration: 0.8,
+          ease: "back.out(1.7)",
+          stagger: {
+            each: 0.08,
+            from: "start"
+          }
+        });
+
+        // Animate second word (gray)
+        titleTl.to(allLetters.slice(firstWordLetters.length), {
+          opacity: 1,
+          y: 0,
+          rotationX: 0,
+          scale: 1,
+          duration: 0.8,
+          ease: "back.out(1.7)",
+          stagger: {
+            each: 0.06,
+            from: "start"
+          },
+          color: "#9CA3AF" // gray-400
+        }, "-=0.5");
+
+        // Add glow effect
+        titleTl.to(allLetters, {
+          textShadow: "0 0 15px rgba(255,255,255,0.4)",
+          duration: 0.4,
+          stagger: 0.03
+        }, "-=0.3");
+
+        // Add hover effects
+        allLetters.forEach((letter, index) => {
+          if (letter) {
+            letter.addEventListener('mouseenter', () => {
+              gsap.to(letter, {
+                scale: 1.3,
+                y: -8,
+                rotationZ: gsap.utils.random(-15, 15),
+                duration: 0.3,
+                ease: "back.out(1.7)",
+                color: index < firstWordLetters.length ? '#ffffff' : '#ffffff'
+              });
+              
+              // Add intense glow on hover
+              gsap.to(letter, {
+                textShadow: "0 0 25px rgba(255,255,255,0.8)",
+                duration: 0.2
+              });
+            });
+
+            letter.addEventListener('mouseleave', () => {
+              gsap.to(letter, {
+                scale: 1,
+                y: 0,
+                rotationZ: 0,
+                duration: 0.4,
+                ease: "power2.out",
+                color: index < firstWordLetters.length ? '#ffffff' : '#9CA3AF'
+              });
+              
+              // Reduce glow
+              gsap.to(letter, {
+                textShadow: "0 0 15px rgba(255,255,255,0.4)",
+                duration: 0.3
+              });
+            });
+          }
+        });
+      }
+    };
+
+    // Wait a bit for component to mount
+    const timer = setTimeout(() => {
+      animateTitle();
+    }, 100);
+
+    // Cleanup
+    return () => {
+      clearTimeout(timer);
+      lettersRef.current.forEach(letter => {
+        if (letter) {
+          letter.removeEventListener('mouseenter', () => {});
+          letter.removeEventListener('mouseleave', () => {});
+        }
+      });
+    };
+  }, []);
 
   useEffect(() => {
     const container = sectionRef.current;
@@ -28,6 +163,24 @@ const Studio = () => {
     if (!container || !slideContainer || slides.length === 0) return;
 
     const ctx = gsap.context(() => {
+      // Animate the "About Us" text
+      gsap.from('.about-text', {
+        opacity: 0,
+        y: 30,
+        duration: 1,
+        ease: "power3.out",
+        delay: 0.2
+      });
+
+      // Animate the description
+      gsap.from('.description', {
+        opacity: 0,
+        y: 40,
+        duration: 1.2,
+        ease: "power3.out",
+        delay: 1.2
+      });
+
       // Calculate total scroll amount
       const getScrollAmount = () => {
         const slideWidth = slides[0]?.offsetWidth || window.innerWidth * 0.8;
@@ -65,6 +218,7 @@ const Studio = () => {
             
             if (newSlide !== currentSlideRef.current && newSlide >= 0) {
               currentSlideRef.current = newSlide;
+              setActiveSlide(newSlide);
               
               // Update slide indicators
               const slideIndicators = document.querySelectorAll('.slide-indicator');
@@ -86,10 +240,19 @@ const Studio = () => {
                 }
               });
 
-              // Update slide number
+              // Update slide number with animation
               const slideNumber = document.querySelector('.current-slide');
               if (slideNumber) {
-                slideNumber.textContent = newSlide + 1;
+                gsap.to(slideNumber, {
+                  scale: 1.2,
+                  duration: 0.1,
+                  ease: "power2.out",
+                  yoyo: true,
+                  repeat: 1,
+                  onComplete: () => {
+                    slideNumber.textContent = newSlide + 1;
+                  }
+                });
               }
             }
           },
@@ -274,18 +437,60 @@ const Studio = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-black text-white overflow-x-hidden">
-      {/* Header */}
+    <div className="min-h-screen bg-black text-white overflow-x-hidden" id='about-section'>
+      {/* Header with Animated Title */}
       <div className="container mx-auto px-6 pt-20 pb-10">
         <div className="mb-4">
-          <span className="text-sm text-gray-400 uppercase tracking-widest">Our Studio</span>
+          <span className="about-text text-sm text-gray-400 uppercase tracking-widest inline-block">
+            About Us
+          </span>
         </div>
+        
         <h1 className="text-5xl md:text-7xl font-bold mb-6">
-          Creative
-          <br />
-          <span className="text-gray-400">Capabilities</span>
+          <div ref={titleContainerRef} className="leading-tight">
+            {/* First word: NIGHT */}
+            <span className="inline-block mr-4">
+              {firstWordLetters.map((letter, index) => (
+                <span
+                  key={`night-${index}`}
+                  ref={el => lettersRef.current[index] = el}
+                  className="letter inline-block relative cursor-pointer"
+                  style={{
+                    opacity: 0,
+                    transform: 'translateY(40px) rotateX(-30deg) scale(0.8)',
+                    transformOrigin: 'center center',
+                    perspective: '1000px',
+                    transition: 'color 0.3s ease'
+                  }}
+                >
+                  {letter}
+                </span>
+              ))}
+            </span>
+            
+            {/* Second word: PERFORMANCE */}
+            <span className="inline-block text-gray-400">
+              {secondWordLetters.map((letter, index) => (
+                <span
+                  key={`performance-${index}`}
+                  ref={el => lettersRef.current[firstWordLetters.length + index] = el}
+                  className="letter inline-block relative cursor-pointer"
+                  style={{
+                    opacity: 0,
+                    transform: 'translateY(40px) rotateX(-30deg) scale(0.8)',
+                    transformOrigin: 'center center',
+                    perspective: '1000px',
+                    transition: 'color 0.3s ease'
+                  }}
+                >
+                  {letter}
+                </span>
+              ))}
+            </span>
+          </div>
         </h1>
-        <p className="text-gray-400 max-w-2xl">
+        
+        <p className="description text-gray-400 max-w-2xl text-lg leading-relaxed">
           Explore our comprehensive suite of design and development services through this interactive showcase.
         </p>
       </div>
@@ -319,7 +524,7 @@ const Studio = () => {
             <div
               key={index}
               className={`slide-indicator w-2 h-2 rounded-full transition-all duration-300 ${
-                index === 0 ? 'bg-white scale-150' : 'bg-white/30'
+                index === activeSlide ? 'bg-white scale-150' : 'bg-white/30'
               }`}
             ></div>
           ))}

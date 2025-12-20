@@ -77,46 +77,47 @@ const CTAHeroSection = () => {
   return (
     <div 
       ref={sectionRef} 
-      className="bg-black h1 text-white py-16 px-5 md:px-10 lg:px-10"
+      className="bg-black text-white py-10 md:py-24 px-5 md:px-10 lg:px-10 min-h-screen flex items-center h1"
+      id='cta-section'
     >
-      <div className="max-w-7xl mx-auto">
-        <div className="flex flex-col items-center text-center space-y-8">
+      <div className="max-w-7xl mx-auto w-full">
+        <div className="flex flex-col items-center text-center space-y-8 md:space-y-12">
           
           {/* Heading */}
-          <h1 ref={headingRef} className="text-xl md:text-4xl lg:text-4xl xl:text-5xl ">
+          <h1 ref={headingRef} className="text-3xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight">
             Ready to begin
             <br />
-            something great
+            <span className="text-gray-400">something great</span>
           </h1>
 
           {/* Description */}
           <p 
             ref={textRef}
-            className="text-base md:text-lg text-gray-300 max-w-2xl"
+            className="text-base md:text-lg lg:text-xl text-gray-300 max-w-2xl leading-relaxed"
           >
             Let's talk about your next project and what it could become with the right creative partnership.
           </p>
 
           {/* Buttons */}
-          <div ref={buttonsRef} className="flex flex-wrap gap-4">
-            <button className="px-8 py-3 bg-white text-black font-semibold rounded-full hover:bg-gray-200 transition-all duration-300">
-              Start
+          <div ref={buttonsRef} className="flex flex-wrap gap-4 md:gap-6">
+            <button className="px-8 py-4 bg-white text-black font-semibold rounded-full hover:bg-gray-200 transition-all duration-300 hover:scale-105 text-lg">
+              Start a Project
             </button>
             
-            <button className="px-8 py-3 bg-transparent border-2 border-white text-white font-semibold rounded-full hover:bg-white hover:text-black transition-all duration-300">
-              Contact
+            <button className="px-8 py-4 bg-transparent border-2 border-white text-white font-semibold rounded-full hover:bg-white hover:text-black transition-all duration-300 hover:scale-105 text-lg">
+              Contact Us
             </button>
           </div>
 
           {/* Image */}
           <div 
             ref={imageRef}
-            className="w-full w-4xl mt-8 rounded-2xl overflow-hidden shadow-2xl"
+            className="w-full max-w-6xl mt-8 md:mt-16 rounded-2xl overflow-hidden shadow-2xl border border-white/10"
           >
             <img
               src={img}
               alt="Woman with tablet at New York Coffee shop"
-              className="w-full h-full object-cover"
+              className="w-full h-auto object-cover"
             />
           </div>
 

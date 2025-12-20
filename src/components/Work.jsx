@@ -273,7 +273,7 @@ const AdvancedWorkSection = () => {
   ];
 
   return (
-    <div ref={sectionRef} className="w-full h1 bg-black text-white py-24 px-6 sm:px-8 overflow-hidden">
+    <div ref={sectionRef} className="w-full h1 bg-black text-white py-24 px-6 sm:px-8 overflow-hidden" id='work-section'>
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div ref={headerRef} className="text-center mb-16" style={{ perspective: '1000px' }}>

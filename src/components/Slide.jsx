@@ -395,7 +395,7 @@ const NightPerformance = () => {
   }, []);
 
   return (
-    <div ref={sectionRef} className="min-h-screen bg-black text-white font-sans overflow-hidden">
+    <div ref={sectionRef} className="min-h-screen bg-black text-white font-sans overflow-hidden" id='studio-section'>
       {/* Main Container */}
       <div className="max-w-7xl mx-auto px-4 relative">
         {/* Animated background elements */}
@@ -413,7 +413,7 @@ const NightPerformance = () => {
             <div className="header-element text-sm text-gray-500">01/06</div>
           </div>
           
-          <div className="title-container text-6xl md:text-8xl font-bold tracking-tight leading-[0.9] mb-6">
+          <div className="title-container text-5xl md:text-8xl font-bold tracking-tight leading-[0.9] mb-6">
             {/* Letters will be inserted by GSAP */}
           </div>
           
