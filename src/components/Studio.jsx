@@ -1,359 +1,420 @@
 import React, { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ArrowRight } from 'lucide-react';
+import p1 from '/src/assets/p1.png';
+import p2 from '/src/assets/p2.png'; // Add more imports
+import p3 from '/src/assets/p3.png';
+import p4 from '/src/assets/p4.png';
+import p5 from '/src/assets/p5.png';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const AdvancedStudioSection = () => {
+const Studio = () => {
   const sectionRef = useRef(null);
-  const image1Ref = useRef(null);
-  const image2Ref = useRef(null);
-  const textRef = useRef(null);
-  const labelRef = useRef(null);
-  const titleRef = useRef(null);
-  const descRef = useRef(null);
-  const buttonsRef = useRef(null);
-  const imageContainerRef = useRef(null);
+  const slideContainerRef = useRef(null);
+  const slidesRef = useRef([]);
+  const progressBarRef = useRef(null);
+  const currentSlideRef = useRef(0);
+  const totalSlides = 5;
+
+  // Import all your images
+  const images = [p1, p2, p3, p4, p5];
 
   useEffect(() => {
+    const container = sectionRef.current;
+    const slideContainer = slideContainerRef.current;
+    const slides = slidesRef.current.filter(Boolean);
+
+    if (!container || !slideContainer || slides.length === 0) return;
+
     const ctx = gsap.context(() => {
-      // Advanced initial states with 3D transforms
-      gsap.set(image1Ref.current, {
-        opacity: 0,
-        y: 100,
-        x: -50,
-        rotateY: -25,
-        rotateX: 15,
-        scale: 0.8,
-      });
-      
-      gsap.set(image2Ref.current, {
-        opacity: 0,
-        y: 100,
-        x: 50,
-        rotateY: 25,
-        rotateX: 15,
-        scale: 0.8,
-      });
+      // Calculate total scroll amount
+      const getScrollAmount = () => {
+        const slideWidth = slides[0]?.offsetWidth || window.innerWidth * 0.8;
+        const gap = 80;
+        return -(slideWidth + gap) * (slides.length - 1);
+      };
 
-      gsap.set(labelRef.current, {
-        opacity: 0,
-        y: 30,
-        scale: 0.5,
-        rotation: -180,
-      });
-
-      // Split title into words for advanced animation
-      const titleWords = titleRef.current.querySelectorAll('.word');
-      gsap.set(titleWords, {
-        opacity: 0,
-        y: 80,
-        rotateX: -90,
-        transformOrigin: 'center bottom',
-      });
-
-      gsap.set(descRef.current, {
-        opacity: 0,
-        y: 50,
-        clipPath: 'inset(0% 100% 0% 0%)',
-      });
-
-      const buttons = buttonsRef.current.querySelectorAll('button');
-      gsap.set(buttons, {
-        opacity: 0,
-        scale: 0,
-        rotation: 180,
-      });
-
-      // Main entrance timeline
-      const mainTl = gsap.timeline({
+      // Main horizontal scroll animation
+      const horizontalScroll = gsap.to(slideContainer, {
+        x: getScrollAmount,
+        ease: "none",
         scrollTrigger: {
-          trigger: sectionRef.current,
-          start: 'top 70%',
-          end: 'bottom 20%',
-          toggleActions: 'play none none reverse',
-        }
+          trigger: container,
+          start: "top top",
+          end: () => `+=${Math.abs(getScrollAmount()) + window.innerWidth}`,
+          scrub: 1,
+          pin: true,
+          anticipatePin: 1,
+          invalidateOnRefresh: true,
+          onUpdate: (self) => {
+            // Update progress bar
+            if (progressBarRef.current) {
+              gsap.to(progressBarRef.current, {
+                width: `${self.progress * 100}%`,
+                duration: 0.1,
+                overwrite: true
+              });
+            }
+
+            // Calculate current slide
+            const newSlide = Math.min(
+              Math.floor(self.progress * slides.length),
+              slides.length - 1
+            );
+            
+            if (newSlide !== currentSlideRef.current && newSlide >= 0) {
+              currentSlideRef.current = newSlide;
+              
+              // Update slide indicators
+              const slideIndicators = document.querySelectorAll('.slide-indicator');
+              slideIndicators.forEach((indicator, index) => {
+                if (indicator) {
+                  if (index === newSlide) {
+                    gsap.to(indicator, {
+                      scale: 1.5,
+                      backgroundColor: '#ffffff',
+                      duration: 0.3,
+                    });
+                  } else {
+                    gsap.to(indicator, {
+                      scale: 1,
+                      backgroundColor: 'rgba(255, 255, 255, 0.3)',
+                      duration: 0.3,
+                    });
+                  }
+                }
+              });
+
+              // Update slide number
+              const slideNumber = document.querySelector('.current-slide');
+              if (slideNumber) {
+                slideNumber.textContent = newSlide + 1;
+              }
+            }
+          },
+        },
       });
 
-      // Label animation with elastic effect
-      mainTl.to(labelRef.current, {
-        opacity: 1,
-        y: 0,
-        scale: 1,
-        rotation: 0,
-        duration: 1,
-        ease: 'elastic.out(1, 0.6)',
-      })
-      
-      // Image 1 complex entrance
-      .to(image1Ref.current, {
-        opacity: 1,
-        y: 0,
-        x: 0,
-        rotateY: 0,
-        rotateX: 0,
-        scale: 1,
-        duration: 1.2,
-        ease: 'power4.out',
-      }, '-=0.7')
-      
-      // Image 2 complex entrance with delay
-      .to(image2Ref.current, {
-        opacity: 1,
-        y: 0,
-        x: 0,
-        rotateY: 0,
-        rotateX: 0,
-        scale: 1,
-        duration: 1.2,
-        ease: 'power4.out',
-      }, '-=0.8')
-      
-      // Title words cascade
-      .to(titleWords, {
-        opacity: 1,
-        y: 0,
-        rotateX: 0,
-        duration: 0.8,
-        stagger: 0.15,
-        ease: 'back.out(1.4)',
-      }, '-=0.8')
-      
-      // Description wipe effect
-      .to(descRef.current, {
-        opacity: 1,
-        y: 0,
-        clipPath: 'inset(0% 0% 0% 0%)',
-        duration: 1,
-        ease: 'power3.inOut',
-      }, '-=0.4')
-      
-      // Buttons pop in
-      .to(buttons, {
-        opacity: 1,
-        scale: 1,
-        rotation: 0,
-        duration: 0.6,
-        stagger: 0.15,
-        ease: 'back.out(1.7)',
-      }, '-=0.5');
+      // Animate each slide's content as it enters view
+      slides.forEach((slide, index) => {
+        const image = slide.querySelector('.slide-image img');
+        const content = slide.querySelector('.slide-content');
+        const title = slide.querySelector('.slide-title');
+        const description = slide.querySelector('.slide-description');
+        const tag = slide.querySelector('.slide-tag');
+        const button = slide.querySelector('.slide-button');
+        const decorCircles = slide.querySelectorAll('.decor-circle');
 
-      // Advanced parallax effects
-      gsap.to(image1Ref.current, {
-        y: -60,
-        x: -20,
-        rotation: -2,
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: 'top bottom',
-          end: 'bottom top',
-          scrub: 1.5,
-        }
-      });
+        if (!image || !content) return;
 
-      gsap.to(image2Ref.current, {
-        y: -80,
-        x: 20,
-        rotation: 2,
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: 'top bottom',
-          end: 'bottom top',
-          scrub: 1.5,
-        }
-      });
-
-      // Text parallax
-      gsap.to(textRef.current, {
-        y: -30,
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: 'top bottom',
-          end: 'bottom top',
-          scrub: 2,
-        }
-      });
-
-      // Continuous floating animations
-      gsap.to(image1Ref.current, {
-        y: '+=15',
-        rotation: '-=1',
-        duration: 3,
-        repeat: -1,
-        yoyo: true,
-        ease: 'power1.inOut',
-      });
-
-      gsap.to(image2Ref.current, {
-        y: '+=20',
-        rotation: '+=1',
-        duration: 3.5,
-        repeat: -1,
-        yoyo: true,
-        ease: 'power1.inOut',
-        delay: 0.5,
-      });
-
-      // Hover animations for images
-      const img1Inner = image1Ref.current.querySelector('img');
-      const img2Inner = image2Ref.current.querySelector('img');
-
-      image1Ref.current.addEventListener('mouseenter', () => {
-        gsap.to(image1Ref.current, {
-          scale: 1.05,
-          rotation: -3,
-          duration: 0.5,
-          ease: 'power2.out',
+        // Create timeline for each slide
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: slide,
+            containerAnimation: horizontalScroll,
+            start: "left center",
+            end: "right center",
+            scrub: 1,
+          }
         });
-        gsap.to(img1Inner, {
-          scale: 1.15,
-          duration: 0.5,
-          ease: 'power2.out',
-        });
-      });
 
-      image1Ref.current.addEventListener('mouseleave', () => {
-        gsap.to(image1Ref.current, {
+        // Set initial states
+        gsap.set([title, description, tag, button], {
+          opacity: 0,
+          y: 30
+        });
+
+        gsap.set(image, {
+          opacity: 0,
+          scale: 0.9
+        });
+
+        gsap.set(content, {
+          opacity: 0,
+          y: 50
+        });
+
+        gsap.set(decorCircles, {
+          scale: 0,
+          opacity: 0
+        });
+
+        // Animate elements
+        tl.to(image, {
+          opacity: 1,
           scale: 1,
-          rotation: 0,
+          duration: 1,
+          ease: "power2.out"
+        })
+        .to(content, {
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          ease: "power2.out"
+        }, "-=0.8")
+        .to(tag, {
+          opacity: 1,
+          y: 0,
           duration: 0.5,
-          ease: 'power2.out',
-        });
-        gsap.to(img1Inner, {
+          ease: "power2.out"
+        }, "-=0.6")
+        .to(title, {
+          opacity: 1,
+          y: 0,
+          duration: 0.6,
+          ease: "power2.out"
+        }, "-=0.4")
+        .to(description, {
+          opacity: 1,
+          y: 0,
+          duration: 0.6,
+          ease: "power2.out"
+        }, "-=0.3")
+        .to(button, {
+          opacity: 1,
+          y: 0,
+          duration: 0.5,
+          ease: "power2.out"
+        }, "-=0.2")
+        .to(decorCircles, {
           scale: 1,
+          opacity: 1,
           duration: 0.5,
-          ease: 'power2.out',
-        });
-      });
+          stagger: 0.1,
+          ease: "back.out(1.7)"
+        }, "-=0.4");
 
-      image2Ref.current.addEventListener('mouseenter', () => {
-        gsap.to(image2Ref.current, {
-          scale: 1.05,
-          rotation: 3,
-          duration: 0.5,
-          ease: 'power2.out',
-        });
-        gsap.to(img2Inner, {
-          scale: 1.15,
-          duration: 0.5,
-          ease: 'power2.out',
-        });
-      });
-
-      image2Ref.current.addEventListener('mouseleave', () => {
-        gsap.to(image2Ref.current, {
-          scale: 1,
-          rotation: 0,
-          duration: 0.5,
-          ease: 'power2.out',
-        });
-        gsap.to(img2Inner, {
-          scale: 1,
-          duration: 0.5,
-          ease: 'power2.out',
-        });
-      });
-
-      // Button hover animations
-      buttons.forEach(button => {
-        button.addEventListener('mouseenter', () => {
-          gsap.to(button, {
+        // Hover effects
+        const handleMouseEnter = () => {
+          gsap.to(image, {
             scale: 1.05,
-            y: -3,
-            duration: 0.3,
-            ease: 'power2.out',
+            duration: 0.6,
+            ease: "power2.out"
           });
-        });
+          
+          gsap.to(title, {
+            x: 10,
+            duration: 0.4,
+            ease: "power2.out"
+          });
 
-        button.addEventListener('mouseleave', () => {
-          gsap.to(button, {
-            scale: 1,
-            y: 0,
+          gsap.to(decorCircles, {
+            scale: 1.2,
             duration: 0.3,
-            ease: 'power2.out',
+            stagger: 0.05,
+            ease: "power2.out"
           });
-        });
+        };
+
+        const handleMouseLeave = () => {
+          gsap.to(image, {
+            scale: 1,
+            duration: 0.6,
+            ease: "power2.out"
+          });
+          
+          gsap.to(title, {
+            x: 0,
+            duration: 0.4,
+            ease: "power2.out"
+          });
+
+          gsap.to(decorCircles, {
+            scale: 1,
+            duration: 0.3,
+            stagger: 0.05,
+            ease: "power2.out"
+          });
+        };
+
+        slide.addEventListener('mouseenter', handleMouseEnter);
+        slide.addEventListener('mouseleave', handleMouseLeave);
       });
 
-    }, sectionRef);
+    }, container);
 
-    return () => ctx.revert();
+    return () => {
+      ctx.revert();
+      ScrollTrigger.getAll().forEach(st => st.kill());
+    };
   }, []);
 
+  const slides = [
+    {
+      id: 1,
+      title: "Brand Identity",
+      description: "Crafting memorable visual systems that communicate brand essence and values.",
+      tag: "Strategy",
+    },
+    {
+      id: 2,
+      title: "Digital Experience",
+      description: "Building immersive digital platforms that engage and convert audiences.",
+      tag: "Web & Mobile",
+    },
+    {
+      id: 3,
+      title: "Motion Design",
+      description: "Bringing brands to life through fluid animation and cinematic storytelling.",
+      tag: "Animation",
+    },
+    {
+      id: 4,
+      title: "Campaign Strategy",
+      description: "Developing comprehensive marketing campaigns that drive measurable results.",
+      tag: "Marketing",
+    },
+    {
+      id: 5,
+      title: "Content Creation",
+      description: "Producing high-quality visual content that tells compelling brand stories.",
+      tag: "Production",
+    },
+  ];
+
   return (
-    <div ref={sectionRef} className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-20 px-6 md:px-12 lg:px-20 overflow-hidden">
-      <div className="max-w-7xl mx-auto">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-          
-          {/* Images Section */}
-          <div ref={imageContainerRef} className="relative h-[600px] lg:h-[700px]" style={{ perspective: '1200px' }}>
-            {/* Background Image */}
-            <div 
-              ref={image1Ref}
-              className="absolute left-0 top-0 w-[70%] h-[75%] rounded-2xl overflow-hidden shadow-2xl cursor-pointer"
-              style={{ transformStyle: 'preserve-3d' }}
-            >
-              <img
-                src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&h=1000&fit=crop"
-                alt="Team collaboration"
-                className="w-full h-full object-cover transition-transform duration-500"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-500"></div>
-            </div>
+    <div className="min-h-screen bg-black text-white overflow-x-hidden">
+      {/* Header */}
+      <div className="container mx-auto px-6 pt-20 pb-10">
+        <div className="mb-4">
+          <span className="text-sm text-gray-400 uppercase tracking-widest">Our Studio</span>
+        </div>
+        <h1 className="text-5xl md:text-7xl font-bold mb-6">
+          Creative
+          <br />
+          <span className="text-gray-400">Capabilities</span>
+        </h1>
+        <p className="text-gray-400 max-w-2xl">
+          Explore our comprehensive suite of design and development services through this interactive showcase.
+        </p>
+      </div>
 
-            {/* Foreground Image */}
-            <div 
-              ref={image2Ref}
-              className="absolute right-0 bottom-0 w-[70%] h-[65%] rounded-2xl overflow-hidden shadow-2xl cursor-pointer"
-              style={{ transformStyle: 'preserve-3d' }}
-            >
-              <img
-                src="https://images.unsplash.com/photo-1556761175-b413da4baf72?w=800&h=800&fit=crop"
-                alt="Design discussion"
-                className="w-full h-full object-cover transition-transform duration-500"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-500"></div>
+      {/* Horizontal Scroll Section */}
+      <section 
+        ref={sectionRef}
+        className="relative h-screen"
+      >
+        {/* Progress Bar */}
+        <div className="fixed top-0 left-0 right-0 z-50 px-6 pt-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="text-sm text-gray-400">
+              <span className="current-slide">1</span> / {totalSlides}
+            </div>
+            <div className="text-sm text-gray-400">
+              Scroll to explore →
             </div>
           </div>
+          <div className="h-1 bg-gray-800 rounded-full overflow-hidden">
+            <div 
+              ref={progressBarRef}
+              className="h-full bg-white w-0 transition-all"
+            ></div>
+          </div>
+        </div>
 
-          {/* Text Content */}
-          <div ref={textRef} className="space-y-8" style={{ perspective: '1000px' }}>
-            <div ref={labelRef} className="inline-block">
-              <span className="text-sm font-semibold tracking-wider uppercase text-gray-600 bg-white px-4 py-2 rounded-full shadow-sm">
-                Studio
-              </span>
+        {/* Slide Indicators */}
+        <div className="fixed left-6 bottom-6 z-50 flex flex-col gap-3">
+          {slides.map((_, index) => (
+            <div
+              key={index}
+              className={`slide-indicator w-2 h-2 rounded-full transition-all duration-300 ${
+                index === 0 ? 'bg-white scale-150' : 'bg-white/30'
+              }`}
+            ></div>
+          ))}
+        </div>
+
+        {/* Slides Container */}
+        <div 
+          ref={slideContainerRef}
+          className="absolute top-0 left-0 h-full flex items-center gap-20 pl-6 will-change-transform"
+        >
+          {slides.map((slide, index) => (
+            <div
+              key={slide.id}
+              ref={el => slidesRef.current[index] = el}
+              className="flex-shrink-0 w-[80vw] max-w-6xl h-full flex items-center"
+            >
+              <div className="slide-content w-full h-[70vh] rounded-3xl overflow-hidden relative group border border-white/10">
+                {/* Background Image */}
+                <div className="slide-image absolute inset-0">
+                  <img 
+                    src={images[index]} 
+                    alt={slide.title}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
+                </div>
+
+                {/* Content Overlay */}
+                <div className="slide-content relative h-full p-12 flex flex-col justify-end z-10">
+                  <div className="mb-6">
+                    <span className="slide-tag inline-block px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-sm font-medium">
+                      {slide.tag}
+                    </span>
+                  </div>
+                  
+                  <h2 className="slide-title text-5xl md:text-6xl font-bold mb-6">
+                    {slide.title}
+                  </h2>
+                  
+                  <p className="slide-description text-xl text-gray-200 max-w-2xl mb-12">
+                    {slide.description}
+                  </p>
+
+                  <button className="slide-button inline-flex items-center gap-2 text-lg hover:gap-4 transition-all duration-300 bg-white/20 backdrop-blur-sm px-6 py-3 rounded-full border border-white/30 hover:bg-white/30">
+                    <span>Learn more</span>
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                    </svg>
+                  </button>
+                </div>
+
+                {/* Decorative Elements */}
+                <div className="decor-circle absolute top-6 right-6 w-12 h-12 border-2 border-white/50 rounded-full z-20"></div>
+                <div className="decor-circle absolute bottom-6 left-6 w-8 h-8 border-2 border-white/50 rounded-full z-20"></div>
+              </div>
             </div>
+          ))}
+        </div>
 
-            <h1 ref={titleRef} className="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight text-gray-900" style={{ transformStyle: 'preserve-3d' }}>
-              <span className="word inline-block">We</span>{' '}
-              <span className="word inline-block">believe</span>{' '}
-              <span className="word inline-block">in</span>{' '}
-              <span className="word block mt-2">design</span>{' '}
-              <span className="word inline-block">that</span>{' '}
-              <span className="word inline-block">matters</span>
-            </h1>
+        {/* Scroll Hint */}
+        <div className="fixed right-6 bottom-6 z-50 text-gray-400 text-sm animate-pulse">
+          <div className="flex items-center gap-2">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+            </svg>
+            <span>Scroll to navigate</span>
+          </div>
+        </div>
+      </section>
 
-            <p ref={descRef} className="text-lg md:text-xl text-gray-600 leading-relaxed max-w-xl">
-              Our work emerges from a simple conviction: that thoughtful design shapes how people experience the world. We move deliberately, without compromise, building work that resonates long after the first encounter.
+      {/* Bottom Content */}
+      <div className="container mx-auto px-6 py-20 bg-black">
+        <div className="grid md:grid-cols-3 gap-12">
+          <div>
+            <h3 className="text-2xl font-bold mb-4">Our Process</h3>
+            <p className="text-gray-400">
+              We follow a meticulous process that ensures every project delivers exceptional results while maintaining creative excellence.
             </p>
-
-            <div ref={buttonsRef} className="flex gap-4 pt-4">
-              <button className="px-6 py-3 bg-gray-900 text-white font-medium rounded-lg hover:bg-gray-800 transition-colors duration-300 shadow-lg hover:shadow-xl">
-                Our approach
-              </button>
-              
-              <button className="px-6 py-3 border-2 border-gray-900 text-gray-900 font-medium rounded-lg hover:bg-gray-900 hover:text-white transition-all duration-300 flex items-center gap-2 group shadow-lg hover:shadow-xl">
-                Explore
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
-              </button>
-            </div>
           </div>
-
+          <div>
+            <h3 className="text-2xl font-bold mb-4">Collaboration</h3>
+            <p className="text-gray-400">
+              Working closely with clients to understand their vision and translate it into impactful design solutions.
+            </p>
+          </div>
+          <div>
+            <h3 className="text-2xl font-bold mb-4">Innovation</h3>
+            <p className="text-gray-400">
+              Constantly exploring new technologies and techniques to push the boundaries of what's possible in design.
+            </p>
+          </div>
         </div>
       </div>
     </div>
   );
 };
 
-export default AdvancedStudioSection;
+export default Studio;

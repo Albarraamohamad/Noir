@@ -1,4 +1,5 @@
 /* Add to your global CSS file */
+@import url('https://fonts.googleapis.com/css2?family=BBH+Bartle&display=swap');
 .cursor-follower {
   position: fixed;
   width: 40px;
@@ -37,4 +38,9 @@ html {
 
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.2);
+}
+.h1 {
+  font-family: "BBH Bartle";
+  font-weight: 500;
+  font-style: normal;
 }

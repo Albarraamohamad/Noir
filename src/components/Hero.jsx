@@ -38,7 +38,7 @@ const Hero = () => {
   };
 
   return (
-    <section className="relative h-screen w-full overflow-hidden bg-black text-white">
+    <section className="relative h-screen  w-full overflow-hidden bg-black text-white">
       {/* Navbar - Absolute Position Over Video */}
       <nav
         ref={navRef}
@@ -179,14 +179,14 @@ const Hero = () => {
       </video>
 
       {/* Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-r from-black/80  " />
 
       {/* Content */}
-      <div className="relative z-10 max-w-7xl mx-auto px-6 h-full grid md:grid-cols-2 items-center gap-12 pt-20">
+      <div className="relative z-10 max-w-7xl mx-auto px-6 h-full  grid md:grid-cols-2 items-center gap-12 pt-20">
         <h1
           ref={titleRef}
-          className="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight"
-          style={{ fontFamily: "Georgia, serif" }}
+          className="text-2xl leading-tight md:text-4xl lg:text-5xl h1"
+          
         >
           We build experiences that endure
         </h1>

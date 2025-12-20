@@ -27,7 +27,7 @@ const NoirIntro = ({ onFinish }) => {
       .to(textRef.current, {
         opacity: 0,
         duration: 1,
-        delay: 1.2, // total ≈ 4s
+        delay: .5, // total ≈ 4s
         ease: "power2.inOut",
       });
   }, [onFinish]);

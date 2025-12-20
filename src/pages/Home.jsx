@@ -3,6 +3,8 @@ import Work from "../components/Work";
 import Footer from "../components/Footer";
 import StudioSection from "../components/Studio";
 import CTAHeroSection from "../components/Cta";
+import '../App.css'
+import ParallaxGallery from "../components/Slide";
 
 const Home = () => {
   return (
@@ -10,9 +12,10 @@ const Home = () => {
      
       <Hero />
       <Work />
+      <ParallaxGallery/>
       <StudioSection/>
-      <Footer />
       <CTAHeroSection/>
+      <Footer />
     </>
   );
 };

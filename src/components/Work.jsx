@@ -12,8 +12,11 @@ const AdvancedWorkSection = () => {
   const headerRef = useRef(null);
   const cardsRef = useRef([]);
   const linkRef = useRef(null);
+  const hasAnimatedRef = useRef(false);
 
   useEffect(() => {
+    if (hasAnimatedRef.current) return;
+
     const ctx = gsap.context(() => {
       // Header animation with split text effect
       const headerElements = headerRef.current.querySelectorAll('.animate-element');
@@ -34,8 +37,10 @@ const AdvancedWorkSection = () => {
         scrollTrigger: {
           trigger: headerRef.current,
           start: 'top 80%',
-          toggleActions: 'play none none reverse',
-        }
+          toggleActions: 'play none none none', // Changed to play only once
+          once: true, // Add this flag
+        },
+        onComplete: () => hasAnimatedRef.current = true
       });
 
       // Advanced card animations
@@ -93,7 +98,8 @@ const AdvancedWorkSection = () => {
             trigger: card,
             start: 'top 85%',
             end: 'bottom 20%',
-            toggleActions: 'play none none reverse',
+            toggleActions: 'play none none none', // Changed: play only once
+            once: true,
           }
         });
 
@@ -149,7 +155,7 @@ const AdvancedWorkSection = () => {
           ease: 'elastic.out(1, 0.5)',
         }, '-=0.4');
 
-        // Hover animations
+        // Hover animations (these will still work on mouse enter/leave)
         card.addEventListener('mouseenter', () => {
           gsap.to(imageInner, {
             scale: 1.1,
@@ -206,15 +212,16 @@ const AdvancedWorkSection = () => {
           });
         });
 
-        // Continuous floating animation
-        gsap.to(card, {
-          y: -10,
-          duration: 2 + index * 0.3,
-          repeat: -1,
-          yoyo: true,
-          ease: 'power1.inOut',
-          delay: index * 0.2,
-        });
+        // Remove continuous floating animation
+        // This was causing constant animation even after scroll
+        // gsap.to(card, {
+        //   y: -10,
+        //   duration: 2 + index * 0.3,
+        //   repeat: -1,
+        //   yoyo: true,
+        //   ease: 'power1.inOut',
+        //   delay: index * 0.2,
+        // });
       });
 
       // Footer link animation
@@ -231,7 +238,8 @@ const AdvancedWorkSection = () => {
         scrollTrigger: {
           trigger: linkRef.current,
           start: 'top 90%',
-          toggleActions: 'play none none reverse',
+          toggleActions: 'play none none none', // Changed to play only once
+          once: true,
         }
       });
 
@@ -265,14 +273,14 @@ const AdvancedWorkSection = () => {
   ];
 
   return (
-    <div ref={sectionRef} className="w-full bg-white text-black py-24 px-6 sm:px-8 overflow-hidden">
+    <div ref={sectionRef} className="w-full h1 bg-black text-white py-24 px-6 sm:px-8 overflow-hidden">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div ref={headerRef} className="text-center mb-16" style={{ perspective: '1000px' }}>
-          <p className="animate-element text-sm font-semibold tracking-wide mb-4 text-gray-600">
+          <p className="animate-element text-sm mb-4 text-gray-600">
             Work
           </p>
-          <h1 className="animate-element text-5xl sm:text-6xl md:text-7xl font-black mb-6 leading-tight">
+          <h1 className="animate-element text-3xl sm:text-6xl md:text-7xl font-black mb-6">
             Selected projects
           </h1>
           <p className="animate-element text-lg text-gray-600 max-w-2xl mx-auto">
@@ -322,7 +330,7 @@ const AdvancedWorkSection = () => {
                 </div>
                 <a
                   href="#"
-                  className="project-link text-black font-semibold text-sm flex items-center gap-2 group/link hover:text-purple-600 transition-colors duration-300"
+                  className="project-link text-white font-semibold text-sm flex items-center gap-2 group/link hover:text-purple-600 transition-colors duration-300"
                 >
                   View
                   <span className="group-hover/link:translate-x-1 transition-transform duration-300">
