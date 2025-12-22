@@ -13,6 +13,20 @@ import {
     ThreeDScrollTriggerRow 
 } from '../components/lightswind/3d-scroll-trigger';
 import ProjectsGrid from '../components/Projects';
+import p1 from '/src/assets/p1.png'
+import p2 from '/src/assets/p2.png'
+import p3 from '/src/assets/p3.png'
+import p4 from '/src/assets/p4.png'
+import p5 from '/src/assets/p5.png'
+import d1 from '/src/assets/d1.png'
+import d2 from '/src/assets/d2.png'
+import d3 from '/src/assets/d3.png'
+import d4 from '/src/assets/d4.png'
+import d5 from '/src/assets/d5.png'
+import d6 from '/src/assets/d6.png'
+import d7 from '/src/assets/d7.png'
+import d8 from '/src/assets/d8.png'
+import d9 from '/src/assets/d9.png'
 
 const Home = () => {
   useEffect(() => {
@@ -33,61 +47,61 @@ const Home = () => {
   const images = [
    
     {
-      src: "/src/assets/p4.png", 
+      src: p4, 
       alt: "Project 4",
       title: "Digital Excellence",
       description: "Premium quality work"
     },
     {
-      src: "/src/assets/d1.png", 
+      src: d1, 
       alt: "Project 5",
       title: "Modern Design",
       description: "Cutting-edge UI/UX design"
     },
     {
-      src: "/src/assets/d2.png", 
+      src: d2, 
       alt: "Project 6",
       title: "Creative Vision",
       description: "Innovative digital solutions"
     },
      {
-      src: "/src/assets/d3.png", 
+      src: d3, 
       alt: "Project 6",
       title: "Creative Vision",
       description: "Innovative digital solutions"
     },
      {
-      src: "/src/assets/d4.png", 
+      src: d4, 
       alt: "Project 6",
       title: "Creative Vision",
       description: "Innovative digital solutions"
     },
      {
-      src: "/src/assets/d5.png", 
+      src: d5, 
       alt: "Project 6",
       title: "Creative Vision",
       description: "Innovative digital solutions"
     },
      {
-      src: "/src/assets/d6.png", 
+      src: d6, 
       alt: "Project 6",
       title: "Creative Vision",
       description: "Innovative digital solutions"
     },
      {
-      src: "/src/assets/d7.png", 
+      src: d7, 
       alt: "Project 6",
       title: "Creative Vision",
       description: "Innovative digital solutions"
     },
      {
-      src: "/src/assets/d8.png", 
+      src: d8, 
       alt: "Project 6",
       title: "Creative Vision",
       description: "Innovative digital solutions"
     },
      {
-      src: "/src/assets/d9.png", 
+      src: d9, 
       alt: "Project 6",
       title: "Creative Vision",
       description: "Innovative digital solutions"
@@ -97,38 +111,38 @@ const Home = () => {
 const images2 = [
    
     {
-      src: "/src/assets/p1.png", 
+      src: p1, 
       alt: "Project 4",
       title: "Digital Excellence",
       description: "Premium quality work"
     },
     {
-      src: "/src/assets/p2.png", 
+      src: p2, 
       alt: "Project 5",
       title: "Modern Design",
       description: "Cutting-edge UI/UX design"
     },
     {
-      src: "/src/assets/p3.png", 
+      src: p3, 
       alt: "Project 6",
       title: "Creative Vision",
       description: "Innovative digital solutions"
     },
      {
-      src: "/src/assets/p4.png", 
+      src: p4, 
       alt: "Project 6",
       title: "Creative Vision",
       description: "Innovative digital solutions"
     },
 
      {
-      src: "/src/assets/p5.png", 
+      src: p5, 
       alt: "Project 6",
       title: "Creative Vision",
       description: "Innovative digital solutions"
     },
      {
-      src: "/src/assets/d5.png", 
+      src: d5, 
       alt: "Project 6",
       title: "Creative Vision",
       description: "Innovative digital solutions"
