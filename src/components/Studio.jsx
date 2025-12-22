@@ -105,7 +105,7 @@ const Studio = () => {
                   duration: 0.8,
                   ease: "back.out(1.7)",
                   stagger: 0.06,
-                  color: "#9CA3AF"
+                  color: "#c0ff0d"
                 }, "-=0.5");
 
                 allLetters.forEach((letter, index) => {
@@ -116,7 +116,7 @@ const Studio = () => {
                         y: -8,
                         duration: 0.3,
                         ease: "back.out(1.7)",
-                        color: '#ffffff'
+                        color: '#c0ff0d'
                       });
                     });
 
@@ -126,7 +126,7 @@ const Studio = () => {
                         y: 0,
                         duration: 0.4,
                         ease: "power2.out",
-                        color: index < firstWordLetters.length ? '#ffffff' : '#9CA3AF'
+                        color: index < firstWordLetters.length ? '#c0ff0d' : '#c0ff0d'
                       });
                     });
                   }

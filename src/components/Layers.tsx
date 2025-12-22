@@ -1,7 +1,9 @@
 import React from 'react'
 
-export const Layers = () => {
+const Layers = () => {
   return (
     <div>Layers</div>
   )
 }
+
+export default Layers

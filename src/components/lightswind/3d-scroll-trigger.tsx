@@ -11,14 +11,21 @@ import {
 } from "framer-motion";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import type { MotionValue } from "framer-motion";
-
 import { cn } from "../../lib/utils";
+
+export interface ScrollGalleryImage {
+  src: string;
+  alt: string;
+  title?: string;
+  description?: string;
+}
 
 interface ThreeDScrollTriggerRowProps
   extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
   baseVelocity?: number;
   direction?: 1 | -1;
+  images?: ScrollGalleryImage[];
 }
 
 export const wrap = (min: number, max: number, v: number) => {
@@ -78,6 +85,7 @@ function ThreeDScrollTriggerRowImpl({
   direction = 1,
   className,
   velocityFactor,
+  images = [],
   ...props
 }: ThreeDScrollTriggerRowImplProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -92,7 +100,6 @@ function ThreeDScrollTriggerRowImpl({
     const container = containerRef.current;
     if (!container) return;
 
-    // Use a single observer for the container to update the number of copies
     const ro = new ResizeObserver(([entry]) => {
       const containerWidth = entry.contentRect.width;
       const block = container.querySelector(
@@ -147,23 +154,64 @@ function ThreeDScrollTriggerRowImpl({
       {...props}
     >
       <motion.div
-        className="inline-flex will-change-transform transform-gpu"
+        className="inline-flex will-change-transform transform-gpu gap-5 px-4"
         style={{ x: useTransform(x, (v) => `${-v}px`) }}
       >
         {Array.from({ length: numCopies }).map((_, i) => (
           <div
             key={i}
-            className={cn(
-              "inline-flex shrink-0",
-              i === 0 && "threed-scroll-trigger-block"
-            )}
+            className={cn("inline-flex shrink-0 gap-5", i === 0 && "threed-scroll-trigger-block")}
             aria-hidden={i !== 0}
           >
-            {childrenArray}
+            {images.length > 0
+              ? images.map((image, idx) => (
+                  <GalleryCard key={idx} image={image} />
+                ))
+              : childrenArray}
           </div>
         ))}
       </motion.div>
     </div>
+  );
+}
+
+function GalleryCard({ image }: { image: ScrollGalleryImage }) {
+  const [isHovered, setIsHovered] = useState(false);
+
+  return (
+    <motion.div
+      className="relative shrink-0 w-fit h-80 rounded-xl overflow-hidden group cursor-pointer"
+      onHoverStart={() => setIsHovered(true)}
+      onHoverEnd={() => setIsHovered(false)}
+    >
+      {/* Image */}
+      <img
+        src={image.src}
+        alt={image.alt}
+        className="w-full h-full object-cover"
+      />
+
+      {/* Dark overlay on hover */}
+      <motion.div
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: isHovered ? 1 : 0 }}
+        transition={{ duration: 0.3 }}
+      />
+
+      {/* Information overlay on hover */}
+      <motion.div
+        className="absolute inset-0 flex flex-col items-center justify-center text-center px-6 gap-4"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: isHovered ? 1 : 0, y: isHovered ? 0 : 20 }}
+        transition={{ duration: 0.3 }}
+      >
+        <h3 className="text-xl font-bold text-white">{image.title || image.alt}</h3>
+        {image.description && (
+          <p className="text-sm text-gray-200">{image.description}</p>
+        )}
+      </motion.div>
+    </motion.div>
   );
 }
 

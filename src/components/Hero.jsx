@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import Lenis from 'lenis';
 import gsap from "gsap";
 import bg from "/src/assets/nbg.mp4";
 
@@ -310,16 +309,16 @@ const Hero = () => {
       </video>
 
       {/* Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-r from-black/80 to-black" />
+      <div className="absolute inset-0 bg-gradient-to-r from-black/80 to-black/60" />
 
-      {/* Logo - Added ref */}
+      {/* Logo */}
       <div ref={logoRef} className="absolute top-6 left-6 z-50">
         <div className="flex items-center gap-3">
-          <span className="text-xl font-serif h1 text-white">NOIR</span>
+          <span className="text-xl font-serif h1 text-[#c0ff0d]">NOIR</span>
         </div>
       </div>
 
-      {/* Menu Button - Added ref */}
+      {/* Menu Button */}
       <button
         ref={menuButtonRef}
         data-menu-button
@@ -348,7 +347,7 @@ const Hero = () => {
         </div>
       </button>
 
-      {/* Menu Overlay - This covers the whole screen */}
+      {/* Menu Overlay */}
       <div
         className={`fixed inset-0 z-40 bg-black/50 backdrop-blur-sm transition-opacity duration-500 ${
           isMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
@@ -356,14 +355,14 @@ const Hero = () => {
         onClick={() => setIsMenuOpen(false)}
       />
 
-      {/* Menu Panel - Now with proper scrolling */}
+      {/* Menu Panel */}
       <div
         ref={menuRef}
         className={`fixed top-0 right-0 h-full w-full md:w-[500px] bg-black/95 backdrop-blur-xl z-50 transform transition-transform duration-700 ease-out ${
           isMenuOpen ? "translate-x-0" : "translate-x-full"
         } border-l border-white/10 flex flex-col`}
         style={{ boxShadow: isMenuOpen ? '-20px 0 60px rgba(0,0,0,0.8)' : 'none' }}
-        onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside
+        onClick={(e) => e.stopPropagation()}
       >
         {/* Menu Header - Fixed */}
         <div className="p-8 border-b border-white/10 flex-shrink-0">
@@ -446,13 +445,13 @@ const Hero = () => {
       <div className="relative z-10 max-w-7xl mx-auto px-6 h-full grid md:grid-cols-2 items-center gap-12">
         <h1
           ref={titleRef}
-          className="text-2xl md:text-5xl lg:text-5xl h1"
+          className="text-2xl md:text-5xl lg:text-5xl h1 text-[#c0ff0d]"
         >
           We build experiences that endure
         </h1>
 
         <div className="space-y-6 text-left md:text-right">
-          <p ref={descRef} className="text-base md:text-lg text-white/90 max-w-md md:ml-auto">
+          <p ref={descRef} className="text-base md:text-lg text-white max-w-md md:ml-auto">
             A creative studio crafting timeless design for brands that matter. We work at the intersection of strategy and beauty.
           </p>
 
@@ -473,7 +472,7 @@ const Hero = () => {
         </div>
       </div>
 
-      {/* Scroll Indicator - Added ref */}
+      {/* Scroll Indicator */}
       <div 
         ref={scrollIndicatorRef}
         onClick={() => scrollToSection("work-section")}

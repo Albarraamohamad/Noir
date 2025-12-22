@@ -126,8 +126,8 @@ const ProjectsGrid = () => {
       <div className="max-w-7xl mx-auto">
         {/* Header with animation */}
         <div className="mb-16">
-          <h1 className="text-5xl md:text-7xl font-bold text-white mb-4 tracking-tight">
-            PROJECTS
+          <h1 className="text-5xl md:text-7xl font-bold text-[#c0ff0d] mb-4 tracking-tight">
+            ART
           </h1>
           <p className="text-gray-300 text-lg md:text-xl max-w-2xl">
             A curated collection of creative works, experiments, and design explorations.

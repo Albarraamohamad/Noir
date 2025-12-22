@@ -66,7 +66,7 @@ const NightPerformance = () => {
         const words = titleText.split(' ');
         words.forEach((word, wordIndex) => {
           const wordSpan = document.createElement('span');
-          wordSpan.className = `inline-block mr-4 ${wordIndex === 1 ? 'text-gray-400' : ''}`;
+          wordSpan.className = `inline-block mr-4 ${wordIndex === 1 ? 'text-[#c0ff0d]' : ''}`;
           
           word.split('').forEach((letter, letterIndex) => {
             const letterSpan = document.createElement('span');

@@ -13,7 +13,7 @@ export interface MarqueeImage {
 export interface ThreeDMarqueeProps {
   images: MarqueeImage[];
   className?: string;
-  cols?: number; // default is 4
+  cols?: number;
   onImageClick?: (image: MarqueeImage, index: number) => void;
 }
 
@@ -41,8 +41,8 @@ export const ThreeDMarquee: React.FC<ThreeDMarqueeProps> = ({
 
   return (
     <section
-      className={`mx-auto block h-[600px] max-sm:h-[400px] 
-        overflow-hidden rounded-2xl bg-white dark:bg-black ${className}`}
+      className={`mx-auto block h-screen max-sm:h-[500px] 
+        overflow-hidden  dark:bg-black ${className}`}
     >
       <div
         className="flex w-full h-full items-center justify-center"
@@ -52,20 +52,22 @@ export const ThreeDMarquee: React.FC<ThreeDMarqueeProps> = ({
       >
         <div className="w-full overflow-hidden scale-90 sm:scale-100">
           <div
-            className={`relative grid h-full w-full origin-center 
-              grid-cols-2 sm:grid-cols-${cols} gap-4 transform 
-              `}
+            className="relative grid h-full w-full origin-center gap-4 transform"
+            style={{
+              gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
+            }}
           >
             {imageGroups.map((imagesInGroup, idx) => (
+              
               <motion.div
                 key={`column-${idx}`}
-                animate={{ y: idx % 2 === 0 ? 100 : -100 }}
+                animate={{ y: idx % 2 === 0 ? -200 : 200 }}
                 transition={{
-                  duration: idx % 2 === 0 ? 10 : 15,
+                  duration: idx % 2 === 0 ? 3 : 4,
                   repeat: Infinity,
-                  repeatType: "reverse",
+                  ease: "linear",
                 }}
-                className="flex flex-col items-center gap-6 relative"
+                className="flex flex-col items-center gap-12 relative"
               >
                 <div className="absolute left-0 top-0 h-full w-0.5 bg-gray-200 dark:bg-gray-700" />
                 {imagesInGroup.map((image, imgIdx) => {
@@ -73,7 +75,7 @@ export const ThreeDMarquee: React.FC<ThreeDMarqueeProps> = ({
                   const isClickable = image.href || onImageClick;
 
                   return (
-                    <div key={`img-${imgIdx}`} className="relative">
+                    <div key={`img-${imgIdx}`} className="relative h-80 sm:h-96 md:h-[450px]">
                       <div className="absolute top-0 left-0 w-full h-0.5 bg-gray-200 dark:bg-gray-700" />
                       <motion.img
                         whileHover={{ y: -10 }}
@@ -82,7 +84,7 @@ export const ThreeDMarquee: React.FC<ThreeDMarqueeProps> = ({
                         alt={image.alt}
                         width={970}
                         height={700}
-                        className={`aspect-[970/700] w-full max-w-[200px] rounded-lg object-cover ring ring-gray-300/30 dark:ring-gray-800/50 shadow-xl hover:shadow-2xl transition-shadow duration-300 ${
+                        className={`w-full h-full rounded-lg object-cover ring ring-gray-300/30 dark:ring-gray-800/50 shadow-xl hover:shadow-2xl transition-shadow duration-300 ${
                           isClickable ? "cursor-pointer" : ""
                         }`}
                         onClick={() => handleImageClick(image, globalIndex)}
@@ -98,3 +100,5 @@ export const ThreeDMarquee: React.FC<ThreeDMarqueeProps> = ({
     </section>
   );
 };
+
+export default ThreeDMarquee;

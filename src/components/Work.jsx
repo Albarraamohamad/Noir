@@ -37,8 +37,8 @@ const AdvancedWorkSection = () => {
         scrollTrigger: {
           trigger: headerRef.current,
           start: 'top 80%',
-          toggleActions: 'play none none none', // Changed to play only once
-          once: true, // Add this flag
+          toggleActions: 'play none none none',
+          once: true,
         },
         onComplete: () => hasAnimatedRef.current = true
       });
@@ -98,7 +98,7 @@ const AdvancedWorkSection = () => {
             trigger: card,
             start: 'top 85%',
             end: 'bottom 20%',
-            toggleActions: 'play none none none', // Changed: play only once
+            toggleActions: 'play none none none',
             once: true,
           }
         });
@@ -112,15 +112,15 @@ const AdvancedWorkSection = () => {
         })
         .to(image, {
           clipPath: 'inset(0% 0% 0% 0%)',
-          duration: 1,
+          duration: 0.5,
           ease: 'power4.out',
         }, '-=0.6')
         .to(imageInner, {
           scale: 1,
           rotation: 0,
-          duration: 1.2,
+          duration: 0.6,
           ease: 'power3.out',
-        }, '-=1')
+        }, '-=0.5')
         .to(title, {
           opacity: 1,
           y: 0,
@@ -155,7 +155,7 @@ const AdvancedWorkSection = () => {
           ease: 'elastic.out(1, 0.5)',
         }, '-=0.4');
 
-        // Hover animations (these will still work on mouse enter/leave)
+        // Hover animations
         card.addEventListener('mouseenter', () => {
           gsap.to(imageInner, {
             scale: 1.1,
@@ -211,17 +211,6 @@ const AdvancedWorkSection = () => {
             ease: 'power2.out',
           });
         });
-
-        // Remove continuous floating animation
-        // This was causing constant animation even after scroll
-        // gsap.to(card, {
-        //   y: -10,
-        //   duration: 2 + index * 0.3,
-        //   repeat: -1,
-        //   yoyo: true,
-        //   ease: 'power1.inOut',
-        //   delay: index * 0.2,
-        // });
       });
 
       // Footer link animation
@@ -238,7 +227,7 @@ const AdvancedWorkSection = () => {
         scrollTrigger: {
           trigger: linkRef.current,
           start: 'top 90%',
-          toggleActions: 'play none none none', // Changed to play only once
+          toggleActions: 'play none none none',
           once: true,
         }
       });
@@ -280,7 +269,7 @@ const AdvancedWorkSection = () => {
           <p className="animate-element text-sm mb-4 text-gray-600">
             Work
           </p>
-          <h1 className="animate-element text-3xl sm:text-6xl md:text-7xl font-black mb-6">
+          <h1 className="animate-element text-3xl sm:text-6xl md:text-7xl font-black text-[#c0ff0d] mb-6">
             Selected projects
           </h1>
           <p className="animate-element text-lg text-gray-600 max-w-2xl mx-auto">

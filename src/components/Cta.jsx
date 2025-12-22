@@ -80,11 +80,11 @@ const CTAHeroSection = () => {
       className="bg-black text-white py-10 md:py-24 px-5 md:px-10 lg:px-10 min-h-screen flex items-center h1"
       id='cta-section'
     >
-      <div className="max-w-7xl mx-auto w-full">
+      <div className=" w-full">
         <div className="flex flex-col items-center text-center space-y-8 md:space-y-12">
           
           {/* Heading */}
-          <h1 ref={headingRef} className="text-3xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight">
+          <h1 ref={headingRef} className="text-xl md:text-5xl lg:text-6xl xl:text-6xl font-bold text-[#c0ff0d] leading-tight">
             Ready to begin
             <br />
             <span className="text-gray-400">something great</span>
@@ -93,18 +93,18 @@ const CTAHeroSection = () => {
           {/* Description */}
           <p 
             ref={textRef}
-            className="text-base md:text-lg lg:text-xl text-gray-300 max-w-2xl leading-relaxed"
+            className=" md:text-lg lg:text-xl text-gray-300 max-w-2xl leading-relaxed"
           >
             Let's talk about your next project and what it could become with the right creative partnership.
           </p>
 
           {/* Buttons */}
-          <div ref={buttonsRef} className="flex flex-wrap gap-4 md:gap-6">
-            <button className="px-8 py-4 bg-white text-black font-semibold rounded-full hover:bg-gray-200 transition-all duration-300 hover:scale-105 text-lg">
+          <div ref={buttonsRef} className="flex  gap-4 md:gap-6">
+            <button className="px-5 py-2 bg-white text-black  rounded-full hover:bg-gray-200 transition-all duration-300 hover:scale-105 text-sm">
               Start a Project
             </button>
             
-            <button className="px-8 py-4 bg-transparent border-2 border-white text-white font-semibold rounded-full hover:bg-white hover:text-black transition-all duration-300 hover:scale-105 text-lg">
+            <button className="px-5 py-2 bg-transparent border-2 border-white text-white  rounded-full hover:bg-white hover:text-black transition-all duration-300 hover:scale-105 text-sm">
               Contact Us
             </button>
           </div>
