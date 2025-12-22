@@ -43,6 +43,22 @@ const Home = () => {
       lenis.destroy();
     };
   }, []);
+  
+  useEffect(() => {
+    // Preload hero in background while intro plays
+    const timer = setTimeout(() => {
+      setShowHero(true);
+    }, 2000); // Start loading hero 2 seconds into intro
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  const handleIntroFinish = () => {
+    // Intro will zoom out, then we remove it
+    setTimeout(() => {
+      setShowIntro(false);
+    }, 100);
+  };
 
   const images = [
    
