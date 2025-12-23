@@ -42,7 +42,28 @@ export function ThreeDScrollTriggerContainer({
       observer.observe(titleRef.current);
     }
 
-    return () => observer.disconnect();
+    // Scroll-based background animation
+    const handleScroll = () => {
+      if (!titleRef.current) return;
+      const rect = titleRef.current.getBoundingClientRect();
+      const windowHeight = window.innerHeight;
+      
+      // Calculate scroll progress (0 to 1)
+      const start = windowHeight * 0.8;
+      const end = windowHeight * 0.2;
+      const progress = Math.min(Math.max((start - rect.top) / (start - end), 0), 1);
+      
+      // Update background position based on scroll
+      titleRef.current.style.backgroundPosition = `${100 - (progress * 100)}% 0`;
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('scroll', handleScroll);
+    };
   }, []);
 
   const titleText = "GALLERY";
@@ -54,6 +75,14 @@ export function ThreeDScrollTriggerContainer({
         <h1 
           ref={titleRef} 
           className="text-7xl md:text-9xl font-black tracking-tighter uppercase leading-none"
+          style={{
+            background: 'linear-gradient(to right, #c0ff0d 50%, #666 50%)',
+            backgroundSize: '200% 100%',
+            backgroundPosition: '100% 0',
+            WebkitBackgroundClip: 'text',
+            backgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+          }}
         >
           {titleText.split('').map((letter, index) => (
             <span
@@ -63,12 +92,6 @@ export function ThreeDScrollTriggerContainer({
                 opacity: titleVisible ? 1 : 0,
                 transform: titleVisible ? 'translateY(0) rotateX(0deg)' : 'translateY(30px) rotateX(-30deg)',
                 transitionDelay: `${index * 50}ms`,
-                background: 'linear-gradient(to right, #c0ff0d 50%, #666 50%)',
-                backgroundSize: '200% 100%',
-                backgroundPosition: titleVisible ? '0% 0' : '100% 0',
-                WebkitBackgroundClip: 'text',
-                backgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
                 transformStyle: 'preserve-3d',
               }}
             >
@@ -136,6 +159,11 @@ export function ThreeDScrollTriggerRow({
   const childrenArray = React.Children.toArray(children);
   const items = images.length > 0 ? images : childrenArray;
 
+  // Calculate proper infinite loop position
+  const itemWidth = 320 + 20; // width + gap
+  const totalWidth = items.length * itemWidth;
+  const normalizedPosition = ((scrollPosition % totalWidth) + totalWidth) % totalWidth;
+
   return (
     <div
       ref={containerRef}
@@ -145,11 +173,11 @@ export function ThreeDScrollTriggerRow({
       <div
         className="inline-flex will-change-transform gap-5 px-4"
         style={{
-          transform: `translateX(${-scrollPosition % (items.length * 320)}px)`,
+          transform: `translateX(-${normalizedPosition}px)`,
         }}
       >
-        {/* Render 3 copies for seamless loop */}
-        {[0, 1, 2].map((copyIndex) => (
+        {/* Render multiple copies for seamless infinite loop */}
+        {[0, 1, 2, 3, 4].map((copyIndex) => (
           <div key={copyIndex} className="inline-flex shrink-0 gap-5">
             {images.length > 0
               ? images.map((image, idx) => (

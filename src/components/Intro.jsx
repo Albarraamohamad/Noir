@@ -1,22 +1,29 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const NoirIntro = ({ onFinish }) => {
   const containerRef = useRef(null);
+  const [showLetters, setShowLetters] = useState(false);
 
   useEffect(() => {
-    // Simple timeout-based animation - no GSAP overhead
-    const timer = setTimeout(() => {
+    // Trigger letter animation immediately
+    requestAnimationFrame(() => {
+      setShowLetters(true);
+    });
+
+    // Slide up animation
+    const slideTimer = setTimeout(() => {
       if (containerRef.current) {
         containerRef.current.style.transform = "translateY(-100%)";
       }
-    }, 1800);
+    }, 1500);
 
+    // Finish callback
     const finishTimer = setTimeout(() => {
       if (onFinish) onFinish();
-    }, 2800);
+    }, 2500);
 
     return () => {
-      clearTimeout(timer);
+      clearTimeout(slideTimer);
       clearTimeout(finishTimer);
     };
   }, [onFinish]);
@@ -24,38 +31,28 @@ const NoirIntro = ({ onFinish }) => {
   return (
     <div
       ref={containerRef}
-      className="fixed inset-0 bg-black z-50 flex items-center justify-center transition-transform duration-1000 ease-in-out"
+      className="fixed inset-0 bg-black z-50 flex items-center justify-center will-change-transform"
+      style={{
+        transition: 'transform 1s cubic-bezier(0.76, 0, 0.24, 1)',
+      }}
     >
-      <div className="h1 text-[#c0ff0d] text-6xl md:text-8xl font-bold tracking-[0.3em] flex gap-4 animate-fadeInUp">
+      <div className="text-[#c0ff0d] text-6xl md:text-8xl font-bold tracking-[0.3em] flex gap-2 md:gap-4">
         {["N", "O", "I", "R"].map((letter, i) => (
           <span
             key={i}
-            className="inline-block"
+            className="inline-block will-change-transform"
             style={{
-              animation: `fadeInUp 0.6s ease-out forwards`,
-              animationDelay: `${i * 0.1}s`,
-              opacity: 0,
+              opacity: showLetters ? 1 : 0,
+              transform: showLetters ? 'translateY(0)' : 'translateY(20px)',
+              transition: `opacity 0.5s ease-out ${i * 0.08}s, transform 0.5s ease-out ${i * 0.08}s`,
             }}
           >
             {letter}
           </span>
         ))}
       </div>
-
-      <style>{`
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `}</style>
     </div>
   );
 };
 
-export default NoirIntro; 
+export default NoirIntro;
