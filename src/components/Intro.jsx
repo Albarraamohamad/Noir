@@ -1,58 +1,61 @@
 import { useEffect, useRef } from "react";
-import { gsap } from "gsap";
 
 const NoirIntro = ({ onFinish }) => {
   const containerRef = useRef(null);
-  const contentWrapperRef = useRef(null);
-  const lettersRef = useRef([]);
 
   useEffect(() => {
-    const ctx = gsap.context(() => {
-      const tl = gsap.timeline({
-        onComplete: onFinish,
-      });
+    // Simple timeout-based animation - no GSAP overhead
+    const timer = setTimeout(() => {
+      if (containerRef.current) {
+        containerRef.current.style.transform = "translateY(-100%)";
+      }
+    }, 1800);
 
-      // Initial state
-      gsap.set(lettersRef.current, { y: 100, opacity: 0 });
+    const finishTimer = setTimeout(() => {
+      if (onFinish) onFinish();
+    }, 2800);
 
-      tl.to(lettersRef.current, {
-        y: 0,
-        opacity: 1,
-        duration: 0.7,
-        stagger: 0.1,
-        ease: "expo.out",
-      })
-      .to(contentWrapperRef.current, {
-        scale: 0.9,
-        opacity: 0,
-        duration: 0.5,
-        ease: "power2.inOut",
-      }, "+=0.5")
-      // THE SWIPE UP: Reveals the Hero underneath
-      .to(containerRef.current, {
-        yPercent: -100,
-        duration: 1,
-        ease: "expo.inOut",
-      }, "-=0.2");
-    }, containerRef);
-
-    return () => ctx.revert();
+    return () => {
+      clearTimeout(timer);
+      clearTimeout(finishTimer);
+    };
   }, [onFinish]);
 
   return (
-    <div 
+    <div
       ref={containerRef}
-      className="fixed inset-0 z-[9999] flex items-center justify-center bg-black"
+      className="fixed inset-0 bg-black z-50 flex items-center justify-center transition-transform duration-1000 ease-in-out"
     >
-      <div ref={contentWrapperRef}>
-        <h1 className="text-[12vw] font-black flex gap-2 text-[#c0ff0d] h1">
-          {["N", "O", "I", "R"].map((l, i) => (
-            <span key={i} ref={el => lettersRef.current[i] = el}>{l}</span>
-          ))}
-        </h1>
+      <div className="h1 text-[#c0ff0d] text-6xl md:text-8xl font-bold tracking-[0.3em] flex gap-4 animate-fadeInUp">
+        {["N", "O", "I", "R"].map((letter, i) => (
+          <span
+            key={i}
+            className="inline-block"
+            style={{
+              animation: `fadeInUp 0.6s ease-out forwards`,
+              animationDelay: `${i * 0.1}s`,
+              opacity: 0,
+            }}
+          >
+            {letter}
+          </span>
+        ))}
       </div>
+
+      <style>{`
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
     </div>
   );
 };
 
-export default NoirIntro;
+export default NoirIntro; 

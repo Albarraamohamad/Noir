@@ -144,7 +144,7 @@ const Hero = ({ isVisible }) => {
 
       {/* Navigation */}
       <nav className="relative z-50 flex justify-between items-center p-8">
-        <div ref={logoRef} className="text-2xl font-black tracking-tighter text-[#c0ff0d]">
+        <div ref={logoRef} className=" h1 text-2xl font-black tracking-tighter text-[#c0ff0d]">
           NOIR
         </div>
         

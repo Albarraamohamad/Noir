@@ -219,7 +219,7 @@ const Studio = () => {
                 ref={el => slidesRef.current[index] = el}
                 className="flex-shrink-0 w-[85vw] max-w-6xl h-full flex items-center"
               >
-                <div className="w-full h-[75vh] rounded-[2rem] overflow-hidden relative border border-white/10 group">
+                <div className="w-full h-[75vh]  overflow-hidden relative group">
                   <div className="slide-image absolute inset-0">
                     <img src={images[index]} alt={slide.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent"></div>

@@ -1,88 +1,51 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import fn from '/src/assets/fn.mp4';
 
 const ProjectsGrid = () => {
   const itemsRef = useRef([]);
   const titleRef = useRef(null);
+  const [titleVisible, setTitleVisible] = useState(false);
+  const [itemsVisible, setItemsVisible] = useState(false);
 
   const projects = [
     { id: 1, video: fn },
   ];
 
   useEffect(() => {
-    const loadGSAP = async () => {
-      const gsapScript = document.createElement('script');
-      gsapScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js';
-      gsapScript.async = true;
-      
-      const stScript = document.createElement('script');
-      stScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js';
-      stScript.async = true;
+    // Title animation observer
+    const titleObserver = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setTitleVisible(true);
+          titleObserver.disconnect();
+        }
+      },
+      { threshold: 0.3 }
+    );
 
-      gsapScript.onload = () => {
-        document.head.appendChild(stScript);
-        stScript.onload = () => {
-          const { gsap, ScrollTrigger } = window;
-          gsap.registerPlugin(ScrollTrigger);
+    if (titleRef.current) {
+      titleObserver.observe(titleRef.current);
+    }
 
-          if (titleRef.current) {
-            gsap.set(titleRef.current, {
-              opacity: 1, // Set to 1 to remove the dark/faded start
-              backgroundImage: 'linear-gradient(to right, #c0ff0d 50%, #333 50%)', // Changed transparent to #333 for better contrast during fill
-              backgroundSize: '200% 100%',
-              backgroundPosition: '100% 0',
-              WebkitBackgroundClip: 'text',
-              backgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-            });
+    // Items animation observer
+    const itemsObserver = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setItemsVisible(true);
+          itemsObserver.disconnect();
+        }
+      },
+      { threshold: 0.2 }
+    );
 
-            gsap.to(titleRef.current, {
-              backgroundPosition: '0% 0',
-              ease: 'none',
-              scrollTrigger: {
-                trigger: titleRef.current,
-                start: 'top 90%',
-                end: 'top 40%',
-                scrub: true,
-              },
-            });
-          }
+    if (itemsRef.current[0]) {
+      itemsObserver.observe(itemsRef.current[0]);
+    }
 
-          gsap.from(itemsRef.current, {
-            opacity: 0,
-            scale: 0.9,
-            duration: 0.8,
-            stagger: 0.05,
-            ease: 'power3.out',
-            scrollTrigger: {
-              trigger: itemsRef.current[0],
-              start: 'top 90%',
-            }
-          });
-
-          itemsRef.current.forEach((item) => {
-            if (!item) return;
-            const video = item.querySelector('video');
-            
-            item.addEventListener('mouseenter', () => {
-              gsap.to(item, { scale: 1.01, duration: 0.4, ease: 'power2.out' });
-              if (video) video.play();
-            });
-
-            item.addEventListener('mouseleave', () => {
-              gsap.to(item, { scale: 1, duration: 0.4, ease: 'power2.out' });
-              if (video) {
-                video.pause();
-                video.currentTime = 0;
-              }
-            });
-          });
-        };
-      };
-      document.head.appendChild(gsapScript);
+    return () => {
+      titleObserver.disconnect();
+      itemsObserver.disconnect();
     };
-
-    loadGSAP();
   }, []);
 
   return (
@@ -92,7 +55,16 @@ const ProjectsGrid = () => {
         <div className="mb-16">
           <h1 
             ref={titleRef} 
-            className="text-6xl md:text-9xl font-black mb-4 tracking-tighter text-white"
+            className="text-6xl md:text-9xl font-black mb-4 tracking-tighter transition-all duration-1000 ease-out"
+            style={{
+              opacity: titleVisible ? 1 : 0.3,
+              background: 'linear-gradient(to right, #c0ff0d 50%, #333 50%)',
+              backgroundSize: '200% 100%',
+              backgroundPosition: titleVisible ? '0% 0' : '100% 0',
+              WebkitBackgroundClip: 'text',
+              backgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+            }}
           >
             ART
           </h1>
@@ -107,26 +79,23 @@ const ProjectsGrid = () => {
             <div
               key={project.id}
               ref={(el) => (itemsRef.current[index] = el)}
-              className="relative overflow-hidden rounded-3xl cursor-pointer shadow-2xl"
+              className="relative overflow-hidden rounded-3xl shadow-2xl transition-all duration-500 ease-out"
+              style={{
+                opacity: itemsVisible ? 1 : 0,
+                transform: itemsVisible ? 'scale(1)' : 'scale(0.95)',
+                transitionDelay: `${index * 50}ms`
+              }}
             >
               <video
-                className="w-full h-auto object-cover opacity-100 transition-opacity" // Removed opacity-80
+                className="w-full h-auto object-cover"
+                autoPlay
                 muted
                 loop
                 playsInline
-                preload="metadata"
+                preload="auto"
               >
                 <source src={project.video} type="video/mp4" />
               </video>
-              
-              {/* Overlay Button - Simplified to remove dark tint */}
-              <div className="absolute inset-0 opacity-0 hover:opacity-100 transition-opacity duration-500 flex items-center justify-center">
-                <div className="px-8 py-3 bg-[#c0ff0d] rounded-full shadow-lg">
-                  <span className="text-black text-sm font-bold tracking-tighter">
-                    VIEW PROJECT →
-                  </span>
-                </div>
-              </div>
             </div>
           ))}
         </div>
@@ -140,9 +109,9 @@ const ProjectsGrid = () => {
                 15 projects across various disciplines and mediums
               </p>
             </div>
-            <button className="px-10 py-4 bg-[#c0ff0d] text-black font-bold rounded-full hover:scale-105 transition-transform flex items-center gap-3 group/btn">
+            <button className="px-10 py-4 bg-[#c0ff0d] text-black font-bold rounded-full hover:scale-105 transition-transform flex items-center gap-3 group">
               <span>VIEW ALL PROJECTS</span>
-              <span className="text-xl group-hover/btn:translate-x-2 transition-transform">→</span>
+              <span className="text-xl group-hover:translate-x-2 transition-transform">→</span>
             </button>
           </div>
         </div>

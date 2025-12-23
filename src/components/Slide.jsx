@@ -18,17 +18,9 @@ const NightPerformance = () => {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      const elements = {
-        header: headerRef.current,
-        projectCards: projectCardsRef.current,
-        rightColumn: rightColumnRef.current,
-        footer: footerRef.current,
-        metrics: metricsRef.current
-      };
-
-      // --- 1. TITLE ANIMATION (Letters + Scroll Fill) ---
+      // --- 1. TITLE ANIMATION (Main Style Restored) ---
       const titleText = "NIGHT PERFORMANCE";
-      const titleContainer = elements.header?.querySelector('.title-container');
+      const titleContainer = headerRef.current?.querySelector('.title-container');
       
       if (titleContainer) {
         titleContainer.innerHTML = '';
@@ -51,26 +43,26 @@ const NightPerformance = () => {
                 duration: 0.8,
                 delay: wordIndex * 0.3 + letterIndex * 0.05,
                 ease: 'back.out(1.7)',
-                scrollTrigger: { trigger: elements.header, start: 'top 70%', once: true }
+                scrollTrigger: { trigger: headerRef.current, start: 'top 70%', once: true }
               }
             );
 
-            // Scroll Fill for "PERFORMANCE"
-            if (wordIndex === 1) {
-              gsap.set(letterSpan, {
-                backgroundImage: 'linear-gradient(to right, #c0ff0d 50%, #444 50%)',
-                backgroundSize: '200% 100%',
-                backgroundPosition: '100% 0',
-                WebkitBackgroundClip: 'text',
-                backgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-              });
-              gsap.to(letterSpan, {
-                backgroundPosition: '0% 0',
-                ease: 'none',
-                scrollTrigger: { trigger: titleContainer, start: 'top 60%', end: 'top 20%', scrub: true }
-              });
-            }
+            // Green Fill Effect
+            gsap.set(letterSpan, {
+              backgroundImage: 'linear-gradient(to right, #c0ff0d 50%, #444 50%)',
+              backgroundSize: '200% 100%',
+              backgroundPosition: '100% 0',
+              WebkitBackgroundClip: 'text',
+              backgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+            });
+
+            gsap.to(letterSpan, {
+              backgroundPosition: '0% 0',
+              ease: 'none',
+              scrollTrigger: { trigger: titleContainer, start: 'top 60%', end: 'top 20%', scrub: true }
+            });
+            
             wordSpan.appendChild(letterSpan);
           });
           titleContainer.appendChild(wordSpan);
@@ -78,24 +70,31 @@ const NightPerformance = () => {
         });
       }
 
-      // --- 2. PROJECT CARDS ANIMATION ---
-      elements.projectCards?.forEach((card, index) => {
+      // --- 2. PROJECT IMAGES ANIMATION (Advanced Reveal) ---
+      projectCardsRef.current.forEach((card) => {
         if (!card) return;
-        const image = card.querySelector('.project-image');
+        const imageWrapper = card.querySelector('.project-image');
+        const imgElement = card.querySelector('img');
+
+        // The "Advanced" Reveal Logic
         gsap.set(card, { opacity: 0, y: 50 });
-        gsap.to(card, {
-          opacity: 1, y: 0, duration: 1,
+        gsap.set(imageWrapper, { clipPath: 'inset(100% 0% 0% 0%)' });
+        gsap.set(imgElement, { scale: 1.4 });
+
+        const tl = gsap.timeline({
           scrollTrigger: { trigger: card, start: 'top 85%', once: true }
         });
+
+        tl.to(card, { opacity: 1, y: 0, duration: 0.8 })
+          .to(imageWrapper, { clipPath: 'inset(0% 0% 0% 0%)', duration: 1, ease: "expo.out" }, "-=0.4")
+          .to(imgElement, { scale: 1, duration: 1.2, ease: "power2.out" }, "-=1");
       });
 
       // --- 3. METRICS ANIMATION ---
-      if (elements.metrics) {
+      if (metricsRef.current) {
         ScrollTrigger.create({
-          trigger: elements.metrics,
+          trigger: metricsRef.current,
           start: 'top 80%',
-          end: 'bottom 20%',
-          scrub: 1,
           onUpdate: (self) => {
             const targets = [75, 66, 50];
             const vals = [240, 180, 150];
@@ -113,7 +112,7 @@ const NightPerformance = () => {
     <div ref={sectionRef} className="min-h-screen bg-black text-white font-sans overflow-hidden py-20" id='studio-section'>
       <div className="max-w-7xl mx-auto px-4 relative">
         
-        {/* Header */}
+        {/* Header (Original Style) */}
         <div ref={headerRef} className="mb-16 relative z-10">
           <div className="flex items-center justify-between mb-8">
             <div className="text-sm text-gray-500 tracking-widest uppercase">Creative Studio</div>
@@ -126,29 +125,32 @@ const NightPerformance = () => {
           </div>
         </div>
 
-        {/* Content Grid */}
+        {/* Content Grid (Original Style) */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 relative z-10">
           
           {/* Left Column */}
           <div className="lg:col-span-2 space-y-12">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {/* Card 1 */}
               <div ref={el => projectCardsRef.current[0] = el} className="group">
                 <div className="project-image overflow-hidden mb-4 aspect-[4/3] bg-neutral-900 rounded-lg">
                   <img src={design} alt="Battoria" className="w-full h-full object-cover" />
                 </div>
-                <h3 className="text-2xl font-bold">BATTORIA</h3>
-                <p className="text-sm text-gray-500">Brand Identity</p>
+                <h3 className="text-2xl font-bold uppercase italic">BATTORIA</h3>
+                <p className="text-sm text-gray-500 uppercase">Brand Identity</p>
               </div>
+              
+              {/* Card 2 */}
               <div ref={el => projectCardsRef.current[1] = el} className="group">
                 <div className="project-image overflow-hidden mb-4 aspect-[4/3] bg-neutral-900 rounded-lg">
                   <img src={design2} alt="Gala" className="w-full h-full object-cover" />
                 </div>
-                <h3 className="text-2xl font-bold">PERFORMANCE GALA</h3>
-                <p className="text-sm text-gray-500">Digital Campaign</p>
+                <h3 className="text-2xl font-bold uppercase italic">PERFORMANCE GALA</h3>
+                <p className="text-sm text-gray-500 uppercase">Digital Campaign</p>
               </div>
             </div>
 
-            {/* RESTORED: Agency Philosophy */}
+            {/* Philosophy */}
             <div className="pt-12 border-t border-gray-800">
               <div className="flex flex-col md:flex-row gap-8">
                 <div className="md:w-1/3">
@@ -165,15 +167,13 @@ const NightPerformance = () => {
 
           {/* Right Column */}
           <div ref={rightColumnRef} className="space-y-12">
-            {/* RESTORED: Award Box */}
             <div className="p-6 bg-neutral-900 rounded-lg text-center">
               <div className="text-6xl font-bold text-white mb-2">14</div>
               <div className="text-sm text-gray-500 uppercase tracking-widest">Award Year</div>
             </div>
 
-            {/* RESTORED: About Description */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold">About the Studio</h3>
+              <h3 className="text-lg font-semibold uppercase italic">About the Studio</h3>
               <p className="text-sm text-gray-500 leading-relaxed">
                 Night Performance is a design agency specializing in creating bold, performance-driven brand experiences.
               </p>
@@ -185,7 +185,7 @@ const NightPerformance = () => {
               {[0, 1, 2].map((i) => (
                 <div key={i}>
                   <div className="flex justify-between mb-2">
-                    <span className="text-xs text-gray-400">{["Growth", "Engagement", "Recognition"][i]}</span>
+                    <span className="text-xs text-gray-400 uppercase">{["Growth", "Engagement", "Recognition"][i]}</span>
                     <span ref={el => percentageTextsRef.current[i] = el} className="text-xs font-bold">+0%</span>
                   </div>
                   <div className="h-1 bg-white/10 rounded-full overflow-hidden">
@@ -193,18 +193,6 @@ const NightPerformance = () => {
                   </div>
                 </div>
               ))}
-            </div>
-
-            {/* RESTORED: Services Grid */}
-            <div className="pt-6 border-t border-gray-800">
-              <h4 className="text-xs uppercase tracking-widest text-gray-500 mb-4">Core Services</h4>
-              <div className="grid grid-cols-2 gap-2">
-                {['Brand Strategy', 'Visual Identity', 'Digital Design', 'Motion'].map(s => (
-                  <div key={s} className="text-[10px] p-2 border border-white/10 text-center rounded uppercase text-gray-400 hover:bg-white hover:text-black transition-all cursor-default">
-                    {s}
-                  </div>
-                ))}
-              </div>
             </div>
           </div>
         </div>
