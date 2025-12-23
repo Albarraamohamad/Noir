@@ -12,6 +12,13 @@ import {
 import React, { useContext, useEffect, useRef, useState } from "react";
 import type { MotionValue } from "framer-motion";
 import { cn } from "../../lib/utils";
+// Ensure GSAP is installed: npm install gsap
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 export interface ScrollGalleryImage {
   src: string;
@@ -22,7 +29,7 @@ export interface ScrollGalleryImage {
 
 interface ThreeDScrollTriggerRowProps
   extends React.HTMLAttributes<HTMLDivElement> {
-  children: React.ReactNode;
+  children?: React.ReactNode;
   baseVelocity?: number;
   direction?: 1 | -1;
   images?: ScrollGalleryImage[];
@@ -53,9 +60,53 @@ export function ThreeDScrollTriggerContainer({
     return sign * magnitude;
   });
 
+  const titleRef = useRef<HTMLHeadingElement>(null);
+
+  // --- GSAP TEXT FILL ANIMATION ---
+  useEffect(() => {
+    if (titleRef.current) {
+      // Initial state: Dim with a transparent gradient mask
+      gsap.set(titleRef.current, {
+        opacity: 0.2,
+        backgroundImage: 'linear-gradient(to right, #c0ff0d 50%, transparent 50%)',
+        backgroundSize: '200% 100%',
+        backgroundPosition: '100% 0',
+        WebkitBackgroundClip: 'text',
+        backgroundClip: 'text',
+        WebkitTextFillColor: 'transparent',
+      });
+
+      // Fill animation on scroll
+      gsap.to(titleRef.current, {
+        opacity: 1,
+        backgroundPosition: '0% 0',
+        ease: 'none',
+        scrollTrigger: {
+          trigger: titleRef.current,
+          start: 'top 85%',
+          end: 'top 30%',
+          scrub: true,
+        },
+      });
+    }
+  }, []);
+
   return (
     <ThreeDScrollTriggerContext.Provider value={velocityFactor}>
-      <div className={cn("relative w-full", className)} {...props}>
+      <div className={cn("relative w-full bg-black py-20", className)} {...props}>
+        {/* Animated Title */}
+        <div className="container mx-auto px-6 mb-12">
+           <h1 
+            ref={titleRef} 
+            className="text-7xl md:text-9xl font-black tracking-tighter uppercase"
+          >
+            Gallery
+          </h1>
+          <p className="text-gray-500 mt-4 max-w-md">
+            Moving perspectives and curated visual stories through continuous motion.
+          </p>
+        </div>
+
         {children}
       </div>
     </ThreeDScrollTriggerContext.Provider>
@@ -120,7 +171,6 @@ function ThreeDScrollTriggerRowImpl({
     });
 
     ro.observe(container);
-
     return () => ro.disconnect();
   }, []);
 
@@ -150,7 +200,7 @@ function ThreeDScrollTriggerRowImpl({
   return (
     <div
       ref={containerRef}
-      className={cn("w-full overflow-hidden whitespace-nowrap", className)}
+      className={cn("w-full overflow-hidden whitespace-nowrap py-4", className)}
       {...props}
     >
       <motion.div
@@ -180,35 +230,36 @@ function GalleryCard({ image }: { image: ScrollGalleryImage }) {
 
   return (
     <motion.div
-      className="relative shrink-0 w-fit h-80 rounded-xl overflow-hidden group cursor-pointer"
+      className="relative shrink-0 w-fit h-80 overflow-hidden group cursor-pointer "
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
+      whileHover={{ scale: 1.02 }}
+      transition={{ type: "spring", stiffness: 300, damping: 20 }}
     >
-      {/* Image */}
       <img
         src={image.src}
         alt={image.alt}
-        className="w-full h-full object-cover"
+        className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
       />
 
-      {/* Dark overlay on hover */}
       <motion.div
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/60 backdrop-blur-[2px]"
         initial={{ opacity: 0 }}
         animate={{ opacity: isHovered ? 1 : 0 }}
-        transition={{ duration: 0.3 }}
       />
 
-      {/* Information overlay on hover */}
       <motion.div
-        className="absolute inset-0 flex flex-col items-center justify-center text-center px-6 gap-4"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: isHovered ? 1 : 0, y: isHovered ? 0 : 20 }}
-        transition={{ duration: 0.3 }}
+        className="absolute inset-0 flex flex-col items-center justify-center text-center px-6 gap-2"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: isHovered ? 1 : 0, y: isHovered ? 0 : 10 }}
       >
-        <h3 className="text-xl font-bold text-white">{image.title || image.alt}</h3>
+        <h3 className="text-[#c0ff0d] text-xl font-bold uppercase tracking-tighter">
+          {image.title || image.alt}
+        </h3>
         {image.description && (
-          <p className="text-sm text-gray-200">{image.description}</p>
+          <p className="text-xs text-gray-300 line-clamp-2 uppercase">
+            {image.description}
+          </p>
         )}
       </motion.div>
     </motion.div>

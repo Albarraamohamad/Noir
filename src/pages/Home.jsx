@@ -176,9 +176,7 @@ const images2 = [
       {/* 3 Row Scroll Gallery */}
       <section className="w-full py-10 bg-black">
         <div className=" mb-12 ">
-          <h2 className="text-4xl  md:text-5xl font-bold text-[#c0ff0d] px-5">
-             GALLERY
-          </h2>
+         
           <p className="text-gray-400  mt-4 px-5">
             Hover over images to see details
           </p>

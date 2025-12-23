@@ -1,25 +1,34 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import NoirIntro from "./components/Intro";
 import './App.css'
 
 const App = () => {
-  const [showHero, setShowHero] = useState(false);
+  const [introFinished, setIntroFinished] = useState(false);
+
+  useEffect(() => {
+    // Prevent scrolling until intro is done
+    if (!introFinished) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+  }, [introFinished]);
 
   return (
-    <>
-      {!showHero && <NoirIntro onFinish={() => setShowHero(true)} />}
-
-      {showHero && (
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Home />} />
-          </Routes>
-        </BrowserRouter>
+    <BrowserRouter>
+      {/* The Intro is on top (z-50). 
+        When it finishes, it will slide UP, revealing the Routes below.
+      */}
+      {!introFinished && (
+        <NoirIntro onFinish={() => setIntroFinished(true)} />
       )}
-      
-    </>
+
+      <Routes>
+        <Route path="/" element={<Home isVisible={introFinished} />} />
+      </Routes>
+    </BrowserRouter>
   );
 };
 

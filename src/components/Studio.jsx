@@ -17,27 +17,16 @@ const Studio = () => {
   const [isMobile, setIsMobile] = useState(false);
   const totalSlides = 5;
 
-  const images = [
-    p1,
-    p2,
-    p3,
-    p4,
-    p5
-  ];
+  const images = [p1, p2, p3, p4, p5];
 
   const titleWords = ["NIGHT", "PERFORMANCE"];
   const firstWordLetters = titleWords[0].split('');
   const secondWordLetters = titleWords[1].split('');
 
-  // Check for mobile
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
     checkMobile();
     window.addEventListener('resize', checkMobile);
-    
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
@@ -52,208 +41,103 @@ const Studio = () => {
       scrollTriggerScript.async = true;
       
       gsapScript.onload = () => {
+        document.head.appendChild(scrollTriggerScript);
         scrollTriggerScript.onload = () => {
-          const { gsap } = window;
+          const { gsap, ScrollTrigger } = window;
+          gsap.registerPlugin(ScrollTrigger);
           
-          if (typeof gsap !== 'undefined' && gsap.registerPlugin) {
-            gsap.registerPlugin(window.ScrollTrigger);
-            
-            // Title animation
-            const animateTitle = () => {
-              const allLetters = lettersRef.current.filter(Boolean);
-              
-              if (allLetters.length > 0) {
-                gsap.set(allLetters, {
-                  opacity: 0,
-                  y: 40,
-                  rotationX: -30,
-                  scale: 0.8
-                });
+          const allLetters = lettersRef.current.filter(Boolean);
 
-                const titleTl = gsap.timeline({
-                  delay: 0.5,
-                  onComplete: () => {
-                    gsap.to(allLetters, {
-                      y: -3,
-                      duration: 2,
-                      repeat: -1,
-                      yoyo: true,
-                      ease: "sine.inOut",
-                      stagger: {
-                        amount: 0.8,
-                        from: "random"
-                      }
-                    });
-                  }
-                });
+          if (allLetters.length > 0) {
+            // --- NEW: GRADIENT FILL ANIMATION ---
+            // 1. Initial State: Dim and transparent gradient
+            gsap.set(allLetters, {
+              opacity: 0.2,
+              backgroundImage: 'linear-gradient(to right, #c0ff0d 50%, transparent 50%)',
+              backgroundSize: '200% 100%',
+              backgroundPosition: '100% 0',
+              WebkitBackgroundClip: 'text',
+              backgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              display: 'inline-block'
+            });
 
-                titleTl.to(allLetters.slice(0, firstWordLetters.length), {
-                  opacity: 1,
-                  y: 0,
-                  rotationX: 0,
-                  scale: 1,
-                  duration: 0.8,
-                  ease: "back.out(1.7)",
-                  stagger: 0.08
-                });
-
-                titleTl.to(allLetters.slice(firstWordLetters.length), {
-                  opacity: 1,
-                  y: 0,
-                  rotationX: 0,
-                  scale: 1,
-                  duration: 0.8,
-                  ease: "back.out(1.7)",
-                  stagger: 0.06,
-                  color: "#c0ff0d"
-                }, "-=0.5");
-
-                allLetters.forEach((letter, index) => {
-                  if (letter) {
-                    letter.addEventListener('mouseenter', () => {
-                      gsap.to(letter, {
-                        scale: 1.3,
-                        y: -8,
-                        duration: 0.3,
-                        ease: "back.out(1.7)",
-                        color: '#c0ff0d'
-                      });
-                    });
-
-                    letter.addEventListener('mouseleave', () => {
-                      gsap.to(letter, {
-                        scale: 1,
-                        y: 0,
-                        duration: 0.4,
-                        ease: "power2.out",
-                        color: index < firstWordLetters.length ? '#c0ff0d' : '#c0ff0d'
-                      });
-                    });
-                  }
-                });
+            // 2. Scroll Animation: Fill letters with green as you scroll
+            gsap.to(allLetters, {
+              opacity: 1,
+              backgroundPosition: '0% 0',
+              stagger: 0.05,
+              ease: "none",
+              scrollTrigger: {
+                trigger: titleContainerRef.current,
+                start: "top 80%",
+                end: "top 20%",
+                scrub: true,
               }
-            };
+            });
 
-            const timer = setTimeout(() => {
-              animateTitle();
-            }, 100);
-
-            // Desktop horizontal scroll
-            if (!isMobile) {
-              const container = sectionRef.current;
-              const slideContainer = slideContainerRef.current;
-              const slides = slidesRef.current.filter(Boolean);
-
-              if (container && slideContainer && slides.length > 0) {
-                gsap.from('.about-text', {
-                  opacity: 0,
-                  y: 30,
-                  duration: 1,
-                  ease: "power3.out",
-                  delay: 0.2
+            // 3. Keep your Hover interactions
+            allLetters.forEach((letter) => {
+              letter.addEventListener('mouseenter', () => {
+                gsap.to(letter, {
+                  scale: 1.2,
+                  y: -5,
+                  duration: 0.3,
+                  ease: "back.out(1.7)",
                 });
+              });
 
-                gsap.from('.description', {
-                  opacity: 0,
-                  y: 40,
-                  duration: 1.2,
-                  ease: "power3.out",
-                  delay: 1.2
+              letter.addEventListener('mouseleave', () => {
+                gsap.to(letter, {
+                  scale: 1,
+                  y: 0,
+                  duration: 0.4,
+                  ease: "power2.out",
                 });
+              });
+            });
+          }
 
-                const getScrollAmount = () => {
-                  const slideWidth = slides[0]?.offsetWidth || window.innerWidth * 0.8;
-                  const gap = 80;
-                  return -(slideWidth + gap) * (slides.length - 1);
-                };
+          // Desktop horizontal scroll logic
+          if (!isMobile) {
+            const container = sectionRef.current;
+            const slideContainer = slideContainerRef.current;
+            const slides = slidesRef.current.filter(Boolean);
 
-                const horizontalScroll = gsap.to(slideContainer, {
-                  x: getScrollAmount,
-                  ease: "none",
-                  scrollTrigger: {
-                    trigger: container,
-                    start: "top top",
-                    end: () => `+=${Math.abs(getScrollAmount()) + window.innerWidth}`,
-                    scrub: 1,
-                    pin: true,
-                    anticipatePin: 1,
-                    invalidateOnRefresh: true,
-                    onUpdate: (self) => {
-                      if (progressBarRef.current) {
-                        gsap.to(progressBarRef.current, {
-                          width: `${self.progress * 100}%`,
-                          duration: 0.1
-                        });
-                      }
+            if (container && slideContainer && slides.length > 0) {
+              const getScrollAmount = () => {
+                const slideWidth = slides[0]?.offsetWidth || window.innerWidth * 0.8;
+                const gap = 80;
+                return -(slideWidth + gap) * (slides.length - 1);
+              };
 
-                      const newSlide = Math.min(
-                        Math.floor(self.progress * slides.length),
-                        slides.length - 1
-                      );
-                      
-                      if (newSlide !== currentSlideRef.current && newSlide >= 0) {
-                        currentSlideRef.current = newSlide;
-                        setActiveSlide(newSlide);
-                      }
-                    },
+              const horizontalScroll = gsap.to(slideContainer, {
+                x: getScrollAmount,
+                ease: "none",
+                scrollTrigger: {
+                  trigger: container,
+                  start: "top top",
+                  end: () => `+=${Math.abs(getScrollAmount()) + window.innerWidth}`,
+                  scrub: 1,
+                  pin: true,
+                  anticipatePin: 1,
+                  invalidateOnRefresh: true,
+                  onUpdate: (self) => {
+                    if (progressBarRef.current) {
+                      gsap.set(progressBarRef.current, { width: `${self.progress * 100}%` });
+                    }
+                    const newSlide = Math.min(Math.floor(self.progress * slides.length), slides.length - 1);
+                    if (newSlide !== currentSlideRef.current && newSlide >= 0) {
+                      currentSlideRef.current = newSlide;
+                      setActiveSlide(newSlide);
+                    }
                   },
-                });
-
-                slides.forEach((slide) => {
-                  const image = slide.querySelector('.slide-image img');
-                  const content = slide.querySelector('.slide-content');
-
-                  if (image && content) {
-                    const tl = gsap.timeline({
-                      scrollTrigger: {
-                        trigger: slide,
-                        containerAnimation: horizontalScroll,
-                        start: "left center",
-                        end: "right center",
-                        scrub: 1,
-                      }
-                    });
-
-                    tl.to(image, {
-                      opacity: 1,
-                      scale: 1,
-                      duration: 1,
-                      ease: "power2.out"
-                    });
-                  }
-
-                  slide.addEventListener('mouseenter', () => {
-                    if (image) {
-                      gsap.to(image, {
-                        scale: 1.05,
-                        duration: 0.6,
-                        ease: "power2.out"
-                      });
-                    }
-                  });
-
-                  slide.addEventListener('mouseleave', () => {
-                    if (image) {
-                      gsap.to(image, {
-                        scale: 1,
-                        duration: 0.6,
-                        ease: "power2.out"
-                      });
-                    }
-                  });
-                });
-              }
+                },
+              });
             }
-
-            return () => {
-              clearTimeout(timer);
-            };
           }
         };
-        
-        document.head.appendChild(scrollTriggerScript);
       };
-      
       document.head.appendChild(gsapScript);
     };
 
@@ -261,36 +145,11 @@ const Studio = () => {
   }, [isMobile]);
 
   const slides = [
-    {
-      id: 1,
-      title: "Brand Identity",
-      description: "Crafting memorable visual systems that communicate brand essence and values.",
-      tag: "Strategy",
-    },
-    {
-      id: 2,
-      title: "Digital Experience",
-      description: "Building immersive digital platforms that engage and convert audiences.",
-      tag: "Web & Mobile",
-    },
-    {
-      id: 3,
-      title: "Motion Design",
-      description: "Bringing brands to life through fluid animation and cinematic storytelling.",
-      tag: "Animation",
-    },
-    {
-      id: 4,
-      title: "Campaign Strategy",
-      description: "Developing comprehensive marketing campaigns that drive measurable results.",
-      tag: "Marketing",
-    },
-    {
-      id: 5,
-      title: "Content Creation",
-      description: "Producing high-quality visual content that tells compelling brand stories.",
-      tag: "Production",
-    },
+    { id: 1, title: "Brand Identity", description: "Crafting memorable visual systems that communicate brand essence.", tag: "Strategy" },
+    { id: 2, title: "Digital Experience", description: "Building immersive digital platforms that engage audiences.", tag: "Web & Mobile" },
+    { id: 3, title: "Motion Design", description: "Bringing brands to life through fluid animation.", tag: "Animation" },
+    { id: 4, title: "Campaign Strategy", description: "Developing marketing campaigns that drive results.", tag: "Marketing" },
+    { id: 5, title: "Content Creation", description: "Producing visual content that tells compelling stories.", tag: "Production" },
   ];
 
   return (
@@ -303,118 +162,76 @@ const Studio = () => {
           </span>
         </div>
         
-        <h1 className="text-3xl sm:text-5xl md:text-7xl font-bold mb-4 sm:mb-6">
-          <div ref={titleContainerRef} className="leading-tight">
-            <span className="inline-block mr-2 sm:mr-4">
-              {firstWordLetters.map((letter, index) => (
-                <span
-                  key={`night-${index}`}
-                  ref={el => lettersRef.current[index] = el}
-                  className="letter inline-block relative cursor-pointer"
-                  style={{
-                    opacity: 0,
-                    transformOrigin: 'center center',
-                    perspective: '1000px'
-                  }}
-                >
-                  {letter}
-                </span>
-              ))}
-            </span>
-            
-            <span className="inline-block text-gray-400">
-              {secondWordLetters.map((letter, index) => (
-                <span
-                  key={`performance-${index}`}
-                  ref={el => lettersRef.current[firstWordLetters.length + index] = el}
-                  className="letter inline-block relative cursor-pointer"
-                  style={{
-                    opacity: 0,
-                    transformOrigin: 'center center',
-                    perspective: '1000px'
-                  }}
-                >
-                  {letter}
-                </span>
-              ))}
-            </span>
+        <h1 className="text-4xl sm:text-6xl md:text-8xl font-black mb-4 sm:mb-6 tracking-tighter">
+          <div ref={titleContainerRef} className="leading-none">
+            <div className="flex flex-wrap gap-x-4 sm:gap-x-8">
+              <span className="inline-block whitespace-nowrap">
+                {firstWordLetters.map((letter, index) => (
+                  <span
+                    key={`night-${index}`}
+                    ref={el => lettersRef.current[index] = el}
+                    className="inline-block"
+                  >
+                    {letter}
+                  </span>
+                ))}
+              </span>
+              
+              <span className="inline-block whitespace-nowrap">
+                {secondWordLetters.map((letter, index) => (
+                  <span
+                    key={`performance-${index}`}
+                    ref={el => lettersRef.current[firstWordLetters.length + index] = el}
+                    className="inline-block"
+                  >
+                    {letter}
+                  </span>
+                ))}
+              </span>
+            </div>
           </div>
         </h1>
         
-        <p className="description text-gray-400 max-w-2xl text-sm sm:text-base md:text-lg leading-relaxed">
+        <p className="description text-gray-500 max-w-2xl text-sm sm:text-base md:text-lg leading-relaxed mt-8">
           Explore our comprehensive suite of design and development services.
         </p>
       </div>
 
-      {/* Desktop: Horizontal Scroll | Mobile: Vertical Stack */}
+      {/* Desktop / Mobile Content Toggle */}
       {!isMobile ? (
         <section ref={sectionRef} className="relative h-screen">
-          {/* Progress Bar */}
           <div className="fixed top-0 left-0 right-0 z-50 px-6 pt-6">
             <div className="flex items-center justify-between mb-4">
               <div className="text-sm text-gray-400">
-                <span className="current-slide">{activeSlide + 1}</span> / {totalSlides}
+                <span>{activeSlide + 1}</span> / {totalSlides}
               </div>
-              <div className="text-sm text-gray-400">Scroll to explore →</div>
+              <div className="text-sm text-gray-400 font-bold uppercase tracking-tighter">Scroll to explore →</div>
             </div>
-            <div className="h-1 bg-gray-800 rounded-full overflow-hidden">
-              <div ref={progressBarRef} className="h-full bg-white w-0"></div>
+            <div className="h-[2px] bg-gray-800 rounded-full overflow-hidden">
+              <div ref={progressBarRef} className="h-full bg-[#c0ff0d] w-0"></div>
             </div>
           </div>
 
-          {/* Slide Indicators */}
-          <div className="fixed left-6 bottom-6 z-50 flex flex-col gap-3">
-            {slides.map((_, index) => (
-              <div
-                key={index}
-                className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                  index === activeSlide ? 'bg-white scale-150' : 'bg-white/30'
-                }`}
-              ></div>
-            ))}
-          </div>
-
-          {/* Slides Container */}
-          <div 
-            ref={slideContainerRef}
-            className="absolute top-0 left-0 h-full flex items-center gap-20 pl-6"
-          >
+          <div ref={slideContainerRef} className="absolute top-0 left-0 h-full flex items-center gap-20 pl-6">
             {slides.map((slide, index) => (
               <div
                 key={slide.id}
                 ref={el => slidesRef.current[index] = el}
-                className="flex-shrink-0 w-[80vw] max-w-6xl h-full flex items-center"
+                className="flex-shrink-0 w-[85vw] max-w-6xl h-full flex items-center"
               >
-                <div className="w-full h-[70vh] rounded-3xl overflow-hidden relative group border border-white/10">
+                <div className="w-full h-[75vh] rounded-[2rem] overflow-hidden relative border border-white/10 group">
                   <div className="slide-image absolute inset-0">
-                    <img 
-                      src={images[index]} 
-                      alt={slide.title}
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
+                    <img src={images[index]} alt={slide.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent"></div>
                   </div>
-
                   <div className="slide-content relative h-full p-12 flex flex-col justify-end z-10">
-                    <div className="mb-6">
-                      <span className="inline-block px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-sm font-medium">
-                        {slide.tag}
-                      </span>
-                    </div>
-                    
-                    <h2 className="text-5xl md:text-6xl font-bold mb-6">
-                      {slide.title}
-                    </h2>
-                    
-                    <p className="text-xl text-gray-200 max-w-2xl mb-12">
-                      {slide.description}
-                    </p>
-
-                    <button className="inline-flex items-center gap-2 text-lg hover:gap-4 transition-all duration-300 bg-white/20 backdrop-blur-sm px-6 py-3 rounded-full border border-white/30 hover:bg-white/30">
-                      <span>Learn more</span>
-                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                      </svg>
+                    <span className="inline-block px-4 py-1 bg-[#c0ff0d] text-black rounded-full text-xs font-bold uppercase mb-4 w-fit">
+                      {slide.tag}
+                    </span>
+                    <h2 className="text-5xl md:text-7xl font-black mb-4 uppercase tracking-tighter leading-none">{slide.title}</h2>
+                    <p className="text-lg text-gray-400 max-w-xl mb-8">{slide.description}</p>
+                    <button className="flex items-center gap-4 text-[#c0ff0d] font-bold uppercase tracking-widest text-sm group/btn">
+                      Learn more <span className="group-hover:translate-x-2 transition-transform">→</span>
                     </button>
                   </div>
                 </div>
@@ -423,43 +240,15 @@ const Studio = () => {
           </div>
         </section>
       ) : (
-        /* Mobile: Vertical Stack */
-        <div className="px-4 sm:px-6 py-8 space-y-6">
+        <div className="px-4 py-8 space-y-6">
           {slides.map((slide, index) => (
-            <div
-              key={slide.id}
-              className="w-full h-[500px] rounded-2xl overflow-hidden relative border border-white/10"
-            >
-              <div className="absolute inset-0">
-                <img 
-                  src={images[index]} 
-                  alt={slide.title}
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
-              </div>
-
-              <div className="relative h-full p-6 flex flex-col justify-end z-10">
-                <div className="mb-4">
-                  <span className="inline-block px-3 py-1.5 bg-white/20 backdrop-blur-sm rounded-full text-xs font-medium">
-                    {slide.tag}
-                  </span>
-                </div>
-                
-                <h2 className="text-3xl font-bold mb-3">
-                  {slide.title}
-                </h2>
-                
-                <p className="text-sm text-gray-200 mb-6">
-                  {slide.description}
-                </p>
-
-                <button className="inline-flex items-center gap-2 text-sm bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full border border-white/30 w-fit">
-                  <span>Learn more</span>
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                  </svg>
-                </button>
+            <div key={slide.id} className="w-full h-[500px] rounded-3xl overflow-hidden relative border border-white/10">
+              <img src={images[index]} alt={slide.title} className="absolute inset-0 w-full h-full object-cover" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
+              <div className="relative h-full p-8 flex flex-col justify-end">
+                <h2 className="text-3xl font-black uppercase mb-2">{slide.title}</h2>
+                <p className="text-sm text-gray-400 mb-4">{slide.description}</p>
+                <button className="text-[#c0ff0d] font-bold text-sm uppercase">Learn more →</button>
               </div>
             </div>
           ))}
@@ -467,26 +256,18 @@ const Studio = () => {
       )}
 
       {/* Bottom Content */}
-      <div className="container mx-auto px-4 sm:px-6 py-12 sm:py-20 bg-black">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-12">
-          <div>
-            <h3 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">Our Process</h3>
-            <p className="text-sm sm:text-base text-gray-400">
-              We follow a meticulous process that ensures every project delivers exceptional results.
-            </p>
-          </div>
-          <div>
-            <h3 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">Collaboration</h3>
-            <p className="text-sm sm:text-base text-gray-400">
-              Working closely with clients to understand their vision and translate it into impactful solutions.
-            </p>
-          </div>
-          <div>
-            <h3 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">Innovation</h3>
-            <p className="text-sm sm:text-base text-gray-400">
-              Constantly exploring new technologies to push the boundaries of what's possible.
-            </p>
-          </div>
+      <div className="container mx-auto px-4 sm:px-6 py-24 border-t border-white/10">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+          {['Our Process', 'Collaboration', 'Innovation'].map((item, i) => (
+            <div key={i}>
+              <h3 className="text-xl font-black uppercase mb-4 text-[#c0ff0d]">{item}</h3>
+              <p className="text-gray-500 leading-relaxed">
+                {i === 0 && "We follow a meticulous process that ensures every project delivers results."}
+                {i === 1 && "Working closely with clients to translate vision into impactful solutions."}
+                {i === 2 && "Constantly exploring new technologies to push the boundaries of design."}
+              </p>
+            </div>
+          ))}
         </div>
       </div>
     </div>

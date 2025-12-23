@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import img from '/src/assets/panner.png'
+import img from '/src/assets/panner.png';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -14,18 +14,37 @@ const CTAHeroSection = () => {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Set initial states
-      gsap.set(headingRef.current, {
-        opacity: 0,
-        y: 50,
+      // --- NEW: OPACITY TO GREEN FILL ANIMATION FOR HEADING ---
+      const headingLines = headingRef.current.querySelectorAll('.fill-line');
+      
+      headingLines.forEach((line) => {
+        // Initial setup for the fill effect
+        gsap.set(line, {
+          opacity: 0.2,
+          backgroundImage: 'linear-gradient(to right, #c0ff0d 50%, transparent 50%)',
+          backgroundSize: '200% 100%',
+          backgroundPosition: '100% 0',
+          WebkitBackgroundClip: 'text',
+          backgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+        });
+
+        // Scroll animation to "fill" the text
+        gsap.to(line, {
+          opacity: 1,
+          backgroundPosition: '0% 0',
+          ease: 'none',
+          scrollTrigger: {
+            trigger: line,
+            start: 'top 85%',
+            end: 'top 50%',
+            scrub: true,
+          },
+        });
       });
 
-      gsap.set(textRef.current, {
-        opacity: 0,
-        y: 30,
-      });
-
-      gsap.set(buttonsRef.current, {
+      // --- EXISTING ANIMATIONS FOR OTHER ELEMENTS ---
+      gsap.set([textRef.current, buttonsRef.current], {
         opacity: 0,
         y: 30,
       });
@@ -35,27 +54,20 @@ const CTAHeroSection = () => {
         y: 60,
       });
 
-      // Create timeline
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: sectionRef.current,
-          start: 'top 80%',
+          start: 'top 70%',
           toggleActions: 'play none none reverse',
         }
       });
 
-      tl.to(headingRef.current, {
-        opacity: 1,
-        y: 0,
-        duration: 0.8,
-        ease: 'power3.out',
-      })
-      .to(textRef.current, {
+      tl.to(textRef.current, {
         opacity: 1,
         y: 0,
         duration: 0.6,
         ease: 'power3.out',
-      }, '-=0.4')
+      })
       .to(buttonsRef.current, {
         opacity: 1,
         y: 0,
@@ -83,11 +95,10 @@ const CTAHeroSection = () => {
       <div className=" w-full">
         <div className="flex flex-col items-center text-center space-y-8 md:space-y-12">
           
-          {/* Heading */}
-          <h1 ref={headingRef} className="text-xl md:text-5xl lg:text-6xl xl:text-6xl font-bold text-[#c0ff0d] leading-tight">
-            Ready to begin
-            <br />
-            <span className="text-gray-400">something great</span>
+          {/* Heading with Fill Classes */}
+          <h1 ref={headingRef} className="text-xl md:text-5xl lg:text-6xl xl:text-6xl font-bold leading-tight">
+            <span className="fill-line block">Ready to begin</span>
+            <span className="fill-line block text-gray-400">something great</span>
           </h1>
 
           {/* Description */}
@@ -99,12 +110,12 @@ const CTAHeroSection = () => {
           </p>
 
           {/* Buttons */}
-          <div ref={buttonsRef} className="flex  gap-4 md:gap-6">
-            <button className="px-5 py-2 bg-white text-black  rounded-full hover:bg-gray-200 transition-all duration-300 hover:scale-105 text-sm">
+          <div ref={buttonsRef} className="flex gap-4 md:gap-6">
+            <button className="px-5 py-2 bg-white text-black rounded-full hover:bg-gray-200 transition-all duration-300 hover:scale-105 text-sm">
               Start a Project
             </button>
             
-            <button className="px-5 py-2 bg-transparent border-2 border-white text-white  rounded-full hover:bg-white hover:text-black transition-all duration-300 hover:scale-105 text-sm">
+            <button className="px-5 py-2 bg-transparent border-2 border-white text-white rounded-full hover:bg-white hover:text-black transition-all duration-300 hover:scale-105 text-sm">
               Contact Us
             </button>
           </div>
@@ -116,7 +127,7 @@ const CTAHeroSection = () => {
           >
             <img
               src={img}
-              alt="Woman with tablet at New York Coffee shop"
+              alt="Woman with tablet"
               className="w-full h-auto object-cover"
             />
           </div>
