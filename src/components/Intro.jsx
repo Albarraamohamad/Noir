@@ -6,21 +6,19 @@ const NoirIntro = ({ onFinish }) => {
 
   useEffect(() => {
     // Trigger letter animation immediately
-    requestAnimationFrame(() => {
-      setShowLetters(true);
-    });
+    setShowLetters(true);
 
     // Slide up animation
     const slideTimer = setTimeout(() => {
       if (containerRef.current) {
         containerRef.current.style.transform = "translateY(-100%)";
       }
-    }, 1500);
+    }, 1200);
 
     // Finish callback
     const finishTimer = setTimeout(() => {
       if (onFinish) onFinish();
-    }, 2500);
+    }, 2000);
 
     return () => {
       clearTimeout(slideTimer);
@@ -31,20 +29,22 @@ const NoirIntro = ({ onFinish }) => {
   return (
     <div
       ref={containerRef}
-      className="fixed inset-0 bg-black z-50 flex items-center justify-center will-change-transform"
+      className="fixed inset-0 bg-black z-[100] flex items-center justify-center"
       style={{
-        transition: 'transform 1s cubic-bezier(0.76, 0, 0.24, 1)',
+        transition: 'transform 0.8s cubic-bezier(0.76, 0, 0.24, 1)',
+        willChange: 'transform',
       }}
     >
       <div className="text-[#c0ff0d] text-6xl md:text-8xl font-bold tracking-[0.3em] flex gap-2 md:gap-4">
         {["N", "O", "I", "R"].map((letter, i) => (
           <span
             key={i}
-            className="inline-block will-change-transform"
+            className="inline-block"
             style={{
               opacity: showLetters ? 1 : 0,
-              transform: showLetters ? 'translateY(0)' : 'translateY(20px)',
-              transition: `opacity 0.5s ease-out ${i * 0.08}s, transform 0.5s ease-out ${i * 0.08}s`,
+              transform: showLetters ? 'translateY(0)' : 'translateY(15px)',
+              transition: `opacity 0.4s ease-out ${i * 0.06}s, transform 0.4s ease-out ${i * 0.06}s`,
+              willChange: 'opacity, transform',
             }}
           >
             {letter}
